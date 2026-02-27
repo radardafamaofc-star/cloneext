@@ -33,7 +33,7 @@ export default function Settings() {
   const form = useForm<SettingsFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      groqApiKey: "",
+      groqApiKey: "HIDDEN",
       systemPrompt: "",
       isActive: false,
       companyName: "",
@@ -48,7 +48,7 @@ export default function Settings() {
   useEffect(() => {
     if (settings) {
       form.reset({
-        groqApiKey: settings.groqApiKey || "",
+        groqApiKey: "HIDDEN",
         systemPrompt: settings.systemPrompt || "",
         isActive: settings.isActive ?? false,
         companyName: settings.companyName || "",
@@ -61,7 +61,8 @@ export default function Settings() {
   }, [settings, form]);
 
   const onSubmit = (data: SettingsFormValues) => {
-    updateSettings(data);
+    const { groqApiKey, ...rest } = data;
+    updateSettings(rest);
   };
 
   if (isLoading) {
@@ -207,41 +208,6 @@ export default function Settings() {
                     <FormControl>
                       <Textarea placeholder="Se perguntarem sobre entrega: entregamos em 24h..." className="min-h-[100px]" {...field} />
                     </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </CardContent>
-          </Card>
-
-          <Card className="border-border/50 shadow-sm">
-            <CardHeader className="bg-muted/30 border-b border-border/50">
-              <CardTitle className="flex items-center gap-2 font-display text-xl">
-                <KeyRound className="h-5 w-5 text-primary" />
-                Integration Keys
-              </CardTitle>
-              <CardDescription>
-                API credentials required for the language model to function.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6 pt-6">
-              <FormField
-                control={form.control}
-                name="groqApiKey"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Groq API Key</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="password"
-                        placeholder="gsk_..."
-                        className="font-mono text-sm bg-muted/10 border-border/50 focus-visible:ring-primary"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Get your API key from the <a href="https://console.groq.com/keys" target="_blank" rel="noreferrer" className="text-primary hover:underline">Groq Console</a>.
-                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}

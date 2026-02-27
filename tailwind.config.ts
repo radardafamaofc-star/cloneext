@@ -51,7 +51,6 @@ export default {
           foreground: "hsl(var(--destructive-foreground) / <alpha-value>)",
           border: "var(--destructive-border)",
         },
-<<<<<<< HEAD
         ring: "hsl(var(--ring) / <alpha-value>)",
         chart: {
           "1": "hsl(var(--chart-1) / <alpha-value>)",
@@ -59,11 +58,6 @@ export default {
           "3": "hsl(var(--chart-3) / <alpha-value>)",
           "4": "hsl(var(--chart-4) / <alpha-value>)",
           "5": "hsl(var(--chart-5) / <alpha-value>)",
-=======
-        neon: {
-          DEFAULT: "hsl(var(--neon))",
-          glow: "hsl(var(--neon-glow))",
->>>>>>> d019455f2b69024c83df3b4c5c2b1b81d4f40d17
         },
         sidebar: {
           ring: "hsl(var(--sidebar-ring) / <alpha-value>)",
@@ -94,7 +88,6 @@ export default {
         mono: ["var(--font-mono)"],
       },
       keyframes: {
-<<<<<<< HEAD
         "accordion-down": {
           from: { height: "0" },
           to: { height: "var(--radix-accordion-content-height)" },
@@ -112,17 +105,3 @@ export default {
   },
   plugins: [require("tailwindcss-animate"), require("@tailwindcss/typography")],
 } satisfies Config;
-=======
-        "pulse-neon": {
-          "0%, 100%": { boxShadow: "0 0 0 0 hsl(0 85% 55% / 0.4)" },
-          "50%": { boxShadow: "0 0 0 8px hsl(0 85% 55% / 0)" },
-        },
-      },
-      animation: {
-        "pulse-green": "pulse-neon 2s infinite",
-      },
-    },
-  },
-  plugins: [require("tailwindcss-animate")],
-} satisfies Config;
->>>>>>> d019455f2b69024c83df3b4c5c2b1b81d4f40d17
