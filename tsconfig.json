@@ -14,10 +14,17 @@
     "allowImportingTsExtensions": true,
     "moduleResolution": "bundler",
     "baseUrl": ".",
+<<<<<<< HEAD
     "types": ["node", "vite/client"],
     "paths": {
       "@/*": ["./client/src/*"],
       "@shared/*": ["./shared/*"]
     }
   }
+=======
+    "paths": { "@/*": ["./src/*"] },
+    "types": ["react", "react-dom"]
+  },
+  "include": ["src"]
+>>>>>>> d019455f2b69024c83df3b4c5c2b1b81d4f40d17
 }
