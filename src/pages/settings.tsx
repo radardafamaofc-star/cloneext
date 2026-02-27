@@ -9,13 +9,12 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Bot, KeyRound, Save } from "lucide-react";
+import { Bot, Save } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
-// Use partial schema for form, as all fields can be updated
 const formSchema = z.object({
-  groqApiKey: z.string().min(1, "API Key is required"),
-  systemPrompt: z.string().min(10, "Prompt should be at least 10 characters"),
+  groqApiKey: z.string().min(1, "A chave da API é obrigatória"),
+  systemPrompt: z.string().min(10, "O prompt deve ter pelo menos 10 caracteres"),
   isActive: z.boolean().default(false),
   companyName: z.string().optional(),
   ownerName: z.string().optional(),
@@ -44,7 +43,6 @@ export default function Settings() {
     },
   });
 
-  // Update form when data is loaded
   useEffect(() => {
     if (settings) {
       form.reset({
@@ -69,8 +67,8 @@ export default function Settings() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight font-display">Configuration</h1>
-          <p className="text-muted-foreground mt-1">Manage AI behavior and integration keys.</p>
+          <h1 className="text-3xl font-bold tracking-tight font-display">Configurações</h1>
+          <p className="text-muted-foreground mt-1">Gerencie o comportamento da IA e chaves de integração.</p>
         </div>
         <Skeleton className="h-[500px] w-full rounded-xl" />
       </div>
@@ -80,8 +78,8 @@ export default function Settings() {
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight font-display text-foreground">Configuration</h1>
-        <p className="text-muted-foreground mt-1">Manage AI behavior and API connections.</p>
+        <h1 className="text-3xl font-bold tracking-tight font-display text-foreground">Configurações</h1>
+        <p className="text-muted-foreground mt-1">Gerencie o comportamento da IA e conexões.</p>
       </div>
 
       <Form {...form}>
@@ -90,10 +88,10 @@ export default function Settings() {
             <CardHeader className="bg-muted/30 border-b border-border/50">
               <CardTitle className="flex items-center gap-2 font-display text-xl">
                 <Bot className="h-5 w-5 text-primary" />
-                Bot Behavior
+                Comportamento do Bot
               </CardTitle>
               <CardDescription>
-                Customize how your AI sales assistant responds to customers.
+                Personalize como o assistente de vendas responde aos clientes.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6 pt-6">
@@ -104,9 +102,9 @@ export default function Settings() {
                 render={({ field }) => (
                   <FormItem className="flex flex-row items-center justify-between rounded-lg border border-border/50 p-4 shadow-sm bg-background">
                     <div className="space-y-0.5">
-                      <FormLabel className="text-base font-medium">Enable Auto-replies</FormLabel>
+                      <FormLabel className="text-base font-medium">Ativar Respostas Automáticas</FormLabel>
                       <FormDescription>
-                        Turn the bot on or off. When off, the bot will not respond to incoming messages.
+                        Ligue ou desligue o bot. Quando desligado, o bot não responderá mensagens recebidas.
                       </FormDescription>
                     </div>
                     <FormControl>
@@ -124,9 +122,9 @@ export default function Settings() {
                 name="systemPrompt"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-base">System Prompt</FormLabel>
+                    <FormLabel className="text-base">Prompt do Sistema</FormLabel>
                     <FormDescription>
-                      The core instructions for the AI. Tell it how to act, what tone to use, and what information to prioritize.
+                      As instruções principais para a IA. Diga como agir, qual tom usar e quais informações priorizar.
                     </FormDescription>
                     <FormControl>
                       <Textarea
@@ -223,7 +221,7 @@ export default function Settings() {
               className="px-8 shadow-md hover:shadow-lg transition-all"
             >
               <Save className="mr-2 h-4 w-4" />
-              {isPending ? "Saving..." : "Save Configuration"}
+              {isPending ? "Salvando..." : "Salvar Configurações"}
             </Button>
           </div>
         </form>

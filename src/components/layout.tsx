@@ -15,8 +15,8 @@ import {
 } from "@/components/ui/sidebar";
 
 const navigation = [
-  { name: "Dashboard", href: "/", icon: LayoutDashboard },
-  { name: "Settings", href: "/settings", icon: SettingsIcon },
+  { name: "Painel", href: "/", icon: LayoutDashboard },
+  { name: "Configurações", href: "/settings", icon: SettingsIcon },
 ];
 
 export function AppSidebar() {
@@ -30,13 +30,13 @@ export function AppSidebar() {
         </div>
         <div className="flex flex-col">
           <span className="text-sm font-bold tracking-tight font-display">GroqBot</span>
-          <span className="text-xs text-muted-foreground leading-none">Sales Assistant</span>
+          <span className="text-xs text-muted-foreground leading-none">Assistente de Vendas</span>
         </div>
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-            Navigation
+            Navegação
           </SidebarGroupLabel>
           <SidebarGroupContent className="mt-2">
             <SidebarMenu>
