@@ -1,8 +1,22 @@
 # Lovable Infinite — Chrome Extension
 
-## Project Overview
+## Projects
 
-A Chrome browser extension (Manifest V3) called "Lovable Infinite" that generates unlimited prompts for the Lovable platform (lovable.dev).
+### 1. Lovable Infinite (Legacy)
+Original extension files.
+
+### 2. Lovable Infinite V2 (New)
+Clone of the original extension with a new **Blue Theme** layout.
+- Directory: `extension_v2/`
+- Preview Workflow: Port 5000
+
+### 3. Admin Panel
+Management interface for the extension.
+- Directory: `admin_panel/`
+- Workflow: Port 8000 (Python API + Static UI)
+- URL: [Your Repl URL]:8000
+- Credentials: `admin` / `admin`
+- Features: License management (View/Add)
 
 ## Project Type
 
