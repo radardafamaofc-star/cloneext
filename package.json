@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
   "name": "rest-express",
   "version": "1.0.0",
   "type": "module",
@@ -112,5 +113,9 @@
   },
   "optionalDependencies": {
     "bufferutil": "^4.0.8"
+=======
+  "dependencies": {
+    "react": "^18.3.1"
+>>>>>>> 28887960af76918fc81569a055d79a8766be7eca
   }
 }
