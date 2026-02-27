@@ -44,25 +44,32 @@ class AdminHandler(SimpleHTTPRequestHandler):
                 self.wfile.write(b'[]')
         elif self.path.startswith('/api/validate/'):
             license_key = self.path.split('/')[-1]
+            print(f"Validating license: {license_key}")
             self.send_response(200)
             self.send_header('Content-type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
             self.end_headers()
             
             valid = False
             try:
-                with open('api/licenses.json', 'r') as f:
-                    licenses = json.load(f)
-                    for lic in licenses:
-                        if lic.get('key') == license_key:
-                            valid = True
-                            break
-            except (FileNotFoundError, json.JSONDecodeError):
-                pass
+                # Use absolute path to licenses.json
+                api_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'api')
+                license_file = os.path.join(api_dir, 'licenses.json')
+                
+                if os.path.exists(license_file):
+                    with open(license_file, 'r') as f:
+                        licenses = json.load(f)
+                        for lic in licenses:
+                            if lic.get('key') == license_key:
+                                valid = True
+                                break
+            except Exception as e:
+                print(f"Validation error: {e}")
                 
             response = {'valid': valid}
             if valid:
                 response['status'] = 'success'
-                response['sessionToken'] = f"mock_token_{license_key}"
+                response['sessionToken'] = f"sess_{license_key}"
             else:
                 response['status'] = 'error'
                 response['message'] = 'Invalid license key'
