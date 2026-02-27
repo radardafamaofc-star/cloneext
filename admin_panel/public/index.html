@@ -2,40 +2,229 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Lovable Admin Panel</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lovable Admin | Dark Neon</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background: #f4f7f6; margin: 0; padding: 20px; }
-        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        h1 { color: #333; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
-        .btn { padding: 10px 15px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        :root {
+            --bg-dark: #0a0a0a;
+            --panel-bg: #141414;
+            --neon-red: #ff003c;
+            --neon-red-glow: rgba(255, 0, 60, 0.5);
+            --text-main: #e0e0e0;
+            --text-muted: #888;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: var(--panel-bg);
+            border: 1px solid #222;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            position: relative;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -2px; left: -2px; right: -2px; bottom: -2px;
+            background: linear-gradient(45deg, var(--neon-red), transparent, var(--neon-red));
+            border-radius: 14px;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-red);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-align: center;
+            margin-bottom: 40px;
+            text-shadow: 0 0 10px var(--neon-red-glow);
+        }
+
+        .login-box {
+            max-width: 350px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 6px;
+            color: white;
+            font-size: 14px;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--neon-red);
+            box-shadow: 0 0 8px var(--neon-red-glow);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--neon-red);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px var(--neon-red-glow);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 25px var(--neon-red);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid var(--neon-red);
+            margin-top: 10px;
+        }
+
+        #admin-section {
+            display: none;
+        }
+
+        .actions-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .actions-bar input {
+            flex: 1;
+            margin-bottom: 0;
+            min-width: 200px;
+        }
+
+        .actions-bar .btn {
+            width: auto;
+            padding: 0 25px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 10px;
+            margin-top: 20px;
+        }
+
+        th {
+            text-align: left;
+            padding: 15px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 1px;
+        }
+
+        td {
+            padding: 15px;
+            background: #1a1a1a;
+            border-top: 1px solid #222;
+            border-bottom: 1px solid #222;
+        }
+
+        td:first-child { border-left: 1px solid #222; border-radius: 8px 0 0 8px; }
+        td:last-child { border-right: 1px solid #222; border-radius: 0 8px 8px 0; }
+
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: bold;
+            background: rgba(0, 255, 100, 0.1);
+            color: #00ff64;
+        }
+
+        .download-card {
+            background: #1a1a1a;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 40px;
+            border-left: 4px solid var(--neon-red);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .download-info h3 { margin: 0; font-size: 18px; }
+        .download-info p { margin: 5px 0 0; color: var(--text-muted); font-size: 13px; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Lovable Admin Panel</h1>
-        <div id="login-section">
-            <input type="text" id="username" placeholder="Username" style="padding: 8px; margin-bottom: 10px; width: 200px; display: block;">
-            <input type="password" id="password" placeholder="Password" style="padding: 8px; margin-bottom: 10px; width: 200px; display: block;">
-            <button class="btn" onclick="login()">Login</button>
+        <h1>Lovable Infinite Panel</h1>
+
+        <!-- Login -->
+        <div id="login-section" class="login-box">
+            <input type="text" id="username" placeholder="Usuário">
+            <input type="password" id="password" placeholder="Senha">
+            <button class="btn" onclick="login()">Acessar Terminal</button>
         </div>
-        <div id="admin-section" style="display:none;">
-            <h3>Licenses</h3>
-            <div style="margin-bottom: 20px;">
-                <input type="text" id="new-license-key" placeholder="License Key">
-                <button class="btn" onclick="addLicense()">Add License</button>
+
+        <!-- Admin -->
+        <div id="admin-section">
+            <div class="actions-bar">
+                <input type="text" id="new-license-key" placeholder="Nova Chave de Licença">
+                <button class="btn" onclick="addLicense()">Gerar Token</button>
             </div>
+
             <table id="license-table">
                 <thead>
-                    <tr><th>Key</th><th>Status</th><th>Expiry</th></tr>
+                    <tr>
+                        <th>Chave de Acesso</th>
+                        <th>Status</th>
+                        <th>Validade</th>
+                    </tr>
                 </thead>
                 <tbody></tbody>
             </table>
+
+            <div class="download-card">
+                <div class="download-info">
+                    <h3>Pacote da Extensão</h3>
+                    <p>Baixe a versão V2 (Blue Theme) pronta para instalação.</p>
+                </div>
+                <button class="btn" style="width: auto;" onclick="downloadExtension()">Download .ZIP</button>
+            </div>
+            
+            <button class="btn btn-secondary" onclick="location.reload()" style="max-width: 150px; margin-top: 40px;">Sair</button>
         </div>
     </div>
+
     <script>
-        async function login() {
+        function login() {
             const user = document.getElementById('username').value;
             const pass = document.getElementById('password').value;
             if (user === 'admin' && pass === 'admin') {
@@ -43,25 +232,50 @@
                 document.getElementById('admin-section').style.display = 'block';
                 loadLicenses();
             } else {
-                alert('Invalid credentials');
+                alert('Acesso negado: Credenciais inválidas');
             }
         }
+
         async function loadLicenses() {
-            const res = await fetch('/api/licenses');
-            const data = await res.json();
-            const tbody = document.querySelector('#license-table tbody');
-            tbody.innerHTML = data.map(l => `<tr><td>${l.key}</td><td>${l.status}</td><td>${l.expiry}</td></tr>`).join('');
+            try {
+                const res = await fetch('/api/licenses');
+                const data = await res.json();
+                const tbody = document.querySelector('#license-table tbody');
+                tbody.innerHTML = data.map(l => `
+                    <tr>
+                        <td style="font-family: monospace; color: var(--neon-red);">${l.key}</td>
+                        <td><span class="status-badge">Ativo</span></td>
+                        <td>${l.expiry || 'Permanente'}</td>
+                    </tr>
+                `).join('');
+            } catch (e) {
+                console.error('Erro ao carregar tokens:', e);
+            }
         }
+
         async function addLicense() {
-            const key = document.getElementById('new-license-key').value;
+            const keyInput = document.getElementById('new-license-key');
+            const key = keyInput.value.trim();
             if (!key) return;
-            await fetch('/api/licenses', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ key, status: 'active', expiry: '2026-12-31' })
-            });
-            document.getElementById('new-license-key').value = '';
-            loadLicenses();
+
+            try {
+                const res = await fetch('/api/licenses', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ key, status: 'active', expiry: '2026-12-31' })
+                });
+                
+                if (res.ok) {
+                    keyInput.value = '';
+                    loadLicenses();
+                }
+            } catch (e) {
+                alert('Erro ao gerar token');
+            }
+        }
+
+        function downloadExtension() {
+            window.location.href = '/api/download-extension';
         }
     </script>
 </body>

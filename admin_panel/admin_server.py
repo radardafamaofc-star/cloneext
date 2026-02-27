@@ -2,6 +2,8 @@ from http.server import HTTPServer, SimpleHTTPRequestHandler
 import json
 import os
 import sys
+import zipfile
+import io
 
 # Ensure we are in the correct directory relative to the script
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
@@ -53,6 +55,23 @@ class AdminHandler(SimpleHTTPRequestHandler):
                 response['message'] = 'Invalid license key'
                 
             self.wfile.write(json.dumps(response).encode())
+        elif self.path == '/api/download-extension':
+            # Create a ZIP of the extension_v2 folder
+            memory_file = io.BytesIO()
+            with zipfile.ZipFile(memory_file, 'w', zipfile.ZIP_DEFLATED) as zf:
+                extension_path = '../extension_v2'
+                for root, dirs, files in os.walk(extension_path):
+                    for file in files:
+                        file_path = os.path.join(root, file)
+                        # Archive name should be relative to extension_v2
+                        arcname = os.path.relpath(file_path, extension_path)
+                        zf.write(file_path, arcname)
+            
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/zip')
+            self.send_header('Content-Disposition', 'attachment; filename=lovable_extension.zip')
+            self.end_headers()
+            self.wfile.write(memory_file.getvalue())
         else:
             return super().do_GET()
 
@@ -74,9 +93,12 @@ class AdminHandler(SimpleHTTPRequestHandler):
                         except json.JSONDecodeError:
                             licenses = []
                 
-                licenses.append(new_license)
-                with open('api/licenses.json', 'w') as f:
-                    json.dump(licenses, f)
+                # Check if key already exists
+                key_exists = any(l.get('key') == new_license.get('key') for l in licenses)
+                if not key_exists:
+                    licenses.append(new_license)
+                    with open('api/licenses.json', 'w') as f:
+                        json.dump(licenses, f)
                 
                 self.send_response(200)
                 self.send_header('Content-type', 'application/json')
