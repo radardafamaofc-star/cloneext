@@ -40,10 +40,9 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        whatsapp: {
-          DEFAULT: "hsl(var(--whatsapp))",
-          dark: "hsl(var(--whatsapp-dark))",
-          light: "hsl(var(--whatsapp-light))",
+        neon: {
+          DEFAULT: "hsl(var(--neon))",
+          glow: "hsl(var(--neon-glow))",
         },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar))",
@@ -57,13 +56,13 @@ export default {
         sm: "calc(var(--radius) - 4px)",
       },
       keyframes: {
-        "pulse-green": {
-          "0%, 100%": { boxShadow: "0 0 0 0 hsl(142 70% 45% / 0.4)" },
-          "50%": { boxShadow: "0 0 0 8px hsl(142 70% 45% / 0)" },
+        "pulse-neon": {
+          "0%, 100%": { boxShadow: "0 0 0 0 hsl(0 85% 55% / 0.4)" },
+          "50%": { boxShadow: "0 0 0 8px hsl(0 85% 55% / 0)" },
         },
       },
       animation: {
-        "pulse-green": "pulse-green 2s infinite",
+        "pulse-green": "pulse-neon 2s infinite",
       },
     },
   },
