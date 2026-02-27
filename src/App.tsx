@@ -8,6 +8,7 @@ import { Layout } from "@/components/layout";
 import Dashboard from "@/pages/dashboard";
 import Settings from "@/pages/settings";
 import Shortcuts from "@/pages/shortcuts";
+import Contacts from "@/pages/contacts";
 
 function Router() {
   return (
@@ -15,6 +16,7 @@ function Router() {
       <Switch>
         <Route path="/" component={Dashboard} />
         <Route path="/shortcuts" component={Shortcuts} />
+        <Route path="/contacts" component={Contacts} />
         <Route path="/settings" component={Settings} />
         <Route component={NotFound} />
       </Switch>
