@@ -10,6 +10,7 @@ import Settings from "@/pages/settings";
 import Shortcuts from "@/pages/shortcuts";
 import Contacts from "@/pages/contacts";
 import ScheduledMessages from "@/pages/scheduled-messages";
+import BulkSend from "@/pages/bulk-send";
 
 function Router() {
   return (
@@ -19,6 +20,7 @@ function Router() {
         <Route path="/shortcuts" component={Shortcuts} />
         <Route path="/contacts" component={Contacts} />
         <Route path="/scheduled" component={ScheduledMessages} />
+        <Route path="/bulk-send" component={BulkSend} />
         <Route path="/settings" component={Settings} />
         <Route component={NotFound} />
       </Switch>
