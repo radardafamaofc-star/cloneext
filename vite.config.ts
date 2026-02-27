@@ -1,5 +1,4 @@
 import { defineConfig } from "vite";
-<<<<<<< HEAD
 import react from "@vitejs/plugin-react";
 import path from "path";
 import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
@@ -37,15 +36,5 @@ export default defineConfig({
       strict: true,
       deny: ["**/.*"],
     },
-=======
-import react from "@vitejs/plugin-react-swc";
-import path from "path";
-
-export default defineConfig({
-  server: { host: "::", port: 8080 },
-  plugins: [react()],
-  resolve: {
-    alias: { "@": path.resolve(__dirname, "./src") },
->>>>>>> 28887960af76918fc81569a055d79a8766be7eca
   },
 });
