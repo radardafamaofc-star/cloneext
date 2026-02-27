@@ -13,7 +13,6 @@ import { Bot, Save } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const formSchema = z.object({
-  groqApiKey: z.string().min(1, "A chave da API é obrigatória"),
   systemPrompt: z.string().min(10, "O prompt deve ter pelo menos 10 caracteres"),
   isActive: z.boolean().default(false),
   companyName: z.string().optional(),
@@ -32,7 +31,6 @@ export default function Settings() {
   const form = useForm<SettingsFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      groqApiKey: "HIDDEN",
       systemPrompt: "",
       isActive: false,
       companyName: "",
@@ -46,7 +44,6 @@ export default function Settings() {
   useEffect(() => {
     if (settings) {
       form.reset({
-        groqApiKey: "HIDDEN",
         systemPrompt: settings.systemPrompt || "",
         isActive: settings.isActive ?? false,
         companyName: settings.companyName || "",
@@ -59,8 +56,7 @@ export default function Settings() {
   }, [settings, form]);
 
   const onSubmit = (data: SettingsFormValues) => {
-    const { groqApiKey, ...rest } = data;
-    updateSettings(rest);
+    updateSettings(data);
   };
 
   if (isLoading) {
