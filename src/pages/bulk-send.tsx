@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Send, Users, Search, CheckSquare, Download, ShieldCheck } from "lucide-react";
+import { Send, Users, Search, CheckSquare, Upload, ShieldCheck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
 
@@ -68,25 +68,40 @@ export default function BulkSend() {
     setSelected(next);
   };
 
-  const exportCSV = () => {
-    if (!contacts || contacts.length === 0) return;
-    const selectedContacts = contacts.filter((c) => selected.has(c.id));
-    const toExport = selectedContacts.length > 0 ? selectedContacts : contacts;
-    const header = "Telefone,Nome,Data\n";
-    const rows = toExport
-      .map(
-        (c, i) =>
-          `${c.phone_number},"${c.name || `Contato ${i + 1}`}",${new Date(c.created_at).toLocaleDateString("pt-BR")}`
-      )
-      .join("\n");
-    const blob = new Blob([header + rows], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `contatos_${new Date().toISOString().slice(0, 10)}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-    toast({ title: `${toExport.length} contato(s) exportado(s)` });
+  const importCSV = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async (ev) => {
+      const text = ev.target?.result as string;
+      const lines = text.split("\n").filter((l) => l.trim());
+      // skip header if present
+      const start = lines[0]?.toLowerCase().includes("telefone") || lines[0]?.toLowerCase().includes("phone") ? 1 : 0;
+      const rows = lines.slice(start).map((line) => {
+        const parts = line.split(",");
+        const phone = parts[0]?.replace(/["\s]/g, "").trim();
+        const name = parts[1]?.replace(/"/g, "").trim() || "";
+        return { phone_number: phone, name: name || null };
+      }).filter((r) => r.phone_number);
+
+      if (rows.length === 0) {
+        toast({ title: "Nenhum contato encontrado no CSV", variant: "destructive" });
+        return;
+      }
+
+      const { error } = await supabase.from("contacts").upsert(
+        rows.map((r) => ({ phone_number: r.phone_number, name: r.name })),
+        { onConflict: "phone_number" }
+      );
+
+      if (error) {
+        toast({ title: "Erro ao importar contatos", variant: "destructive" });
+      } else {
+        toast({ title: `${rows.length} contato(s) importado(s)` });
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = "";
   };
 
   const handleSend = async () => {
@@ -138,10 +153,11 @@ export default function BulkSend() {
             Selecione contatos e envie uma mensagem para todos de uma vez
           </p>
         </div>
-        <Button variant="outline" onClick={exportCSV} disabled={!contacts?.length}>
-          <Download className="h-4 w-4 mr-2" />
-          Exportar CSV
+        <Button variant="outline" onClick={() => document.getElementById("csv-import")?.click()} disabled={!contacts}>
+          <Upload className="h-4 w-4 mr-2" />
+          Importar CSV
         </Button>
+        <input id="csv-import" type="file" accept=".csv" className="hidden" onChange={importCSV} />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[1fr_350px]">
