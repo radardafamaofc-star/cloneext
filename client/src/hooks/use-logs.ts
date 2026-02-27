@@ -1,24 +1,26 @@
 import { useQuery } from "@tanstack/react-query";
-import { api } from "@shared/routes";
+import { supabase } from "@/integrations/supabase/client";
 
 export function useLogs() {
   return useQuery({
-    queryKey: [api.logs.list.path],
+    queryKey: ["chat_logs"],
     queryFn: async () => {
-      const res = await fetch(api.logs.list.path, { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch chat logs");
-      
-      const data = await res.json();
-      const parsed = api.logs.list.responses[200].safeParse(data);
-      
-      if (!parsed.success) {
-        console.error("[Zod] logs.list validation failed:", parsed.error.format());
-        throw parsed.error;
-      }
-      
-      return parsed.data;
+      const { data, error } = await supabase
+        .from("chat_logs")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(50);
+
+      if (error) throw new Error(error.message);
+
+      return (data || []).map((row: any) => ({
+        id: row.id,
+        phoneNumber: row.phone_number,
+        message: row.message,
+        response: row.response,
+        createdAt: row.created_at,
+      }));
     },
-    // Keep logs relatively fresh
     refetchInterval: 10000,
   });
 }

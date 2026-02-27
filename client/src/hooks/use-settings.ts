@@ -1,21 +1,54 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { api } from "@shared/routes";
-import { z } from "zod";
+import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+
+export interface BotSettings {
+  id: number;
+  system_prompt: string;
+  groq_api_key: string;
+  is_active: boolean;
+  company_name: string;
+  owner_name: string;
+  products: string;
+  pix_key: string;
+  custom_commands: string;
+}
+
+// Map snake_case DB columns to camelCase for the UI
+function mapSettings(row: any): BotSettings & {
+  systemPrompt: string;
+  groqApiKey: string;
+  isActive: boolean;
+  companyName: string;
+  ownerName: string;
+  pixKey: string;
+  customCommands: string;
+} {
+  return {
+    ...row,
+    systemPrompt: row.system_prompt ?? "",
+    groqApiKey: row.groq_api_key ?? "",
+    isActive: row.is_active ?? false,
+    companyName: row.company_name ?? "",
+    ownerName: row.owner_name ?? "",
+    products: row.products ?? "",
+    pixKey: row.pix_key ?? "",
+    customCommands: row.custom_commands ?? "",
+  };
+}
 
 export function useSettings() {
   return useQuery({
-    queryKey: [api.settings.get.path],
+    queryKey: ["bot_settings"],
     queryFn: async () => {
-      const res = await fetch(api.settings.get.path, { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch settings");
-      const data = await res.json();
-      const parsed = api.settings.get.responses[200].safeParse(data);
-      if (!parsed.success) {
-        console.error("[Zod] settings.get validation failed:", parsed.error.format());
-        throw parsed.error;
-      }
-      return parsed.data;
+      const { data, error } = await supabase
+        .from("bot_settings")
+        .select("*")
+        .limit(1)
+        .single();
+
+      if (error) throw new Error(error.message);
+      return mapSettings(data);
     },
   });
 }
@@ -25,40 +58,48 @@ export function useUpdateSettings() {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async (updates: z.infer<typeof api.settings.update.input>) => {
-      const validated = api.settings.update.input.parse(updates);
-      const res = await fetch(api.settings.update.path, {
-        method: api.settings.update.method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(validated),
-        credentials: "include",
-      });
+    mutationFn: async (updates: Record<string, any>) => {
+      // Convert camelCase keys to snake_case for DB
+      const dbUpdates: Record<string, any> = {};
+      const keyMap: Record<string, string> = {
+        systemPrompt: "system_prompt",
+        groqApiKey: "groq_api_key",
+        isActive: "is_active",
+        companyName: "company_name",
+        ownerName: "owner_name",
+        pixKey: "pix_key",
+        customCommands: "custom_commands",
+        products: "products",
+      };
 
-      if (!res.ok) {
-        if (res.status === 400) {
-          const errorData = await res.json();
-          const parsedError = api.settings.update.responses[400].parse(errorData);
-          throw new Error(parsedError.message);
-        }
-        throw new Error("Failed to update settings");
+      for (const [key, value] of Object.entries(updates)) {
+        const dbKey = keyMap[key] || key;
+        dbUpdates[dbKey] = value;
       }
 
-      const data = await res.json();
-      return api.settings.update.responses[200].parse(data);
+      const { data, error } = await supabase
+        .from("bot_settings")
+        .update(dbUpdates)
+        .eq("id", 1)
+        .select()
+        .single();
+
+      if (error) throw new Error(error.message);
+      return mapSettings(data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [api.settings.get.path] });
+      queryClient.invalidateQueries({ queryKey: ["bot_settings"] });
       toast({
-        title: "Settings Saved",
-        description: "Your bot settings have been successfully updated.",
+        title: "Configurações Salvas",
+        description: "As configurações do bot foram atualizadas com sucesso.",
       });
     },
     onError: (error) => {
       toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "An unexpected error occurred",
+        title: "Erro",
+        description: error instanceof Error ? error.message : "Erro inesperado",
         variant: "destructive",
       });
-    }
+    },
   });
 }

@@ -1,24 +1,24 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { api } from "@shared/routes";
+import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
 export function useWhatsAppStatus() {
   return useQuery({
-    queryKey: [api.whatsapp.status.path],
+    queryKey: ["whatsapp_status"],
     queryFn: async () => {
-      const res = await fetch(api.whatsapp.status.path, { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch WhatsApp status");
-      
-      const data = await res.json();
-      const parsed = api.whatsapp.status.responses[200].safeParse(data);
-      
-      if (!parsed.success) {
-        console.error("[Zod] whatsapp.status validation failed:", parsed.error.format());
-        throw parsed.error;
-      }
-      return parsed.data;
+      const { data, error } = await supabase
+        .from("whatsapp_status")
+        .select("*")
+        .limit(1)
+        .single();
+
+      if (error) throw new Error(error.message);
+
+      return {
+        status: (data.status as "connected" | "disconnected" | "qr") || "disconnected",
+        qrCode: data.qr_code || undefined,
+      };
     },
-    // Poll every 3 seconds to check for QR code updates or connection changes
     refetchInterval: 3000,
   });
 }
@@ -29,29 +29,28 @@ export function useRestartWhatsApp() {
 
   return useMutation({
     mutationFn: async () => {
-      const res = await fetch(api.whatsapp.restart.path, {
-        method: api.whatsapp.restart.method,
-        credentials: "include",
-      });
+      // Reset status to disconnected in Supabase
+      const { error } = await supabase
+        .from("whatsapp_status")
+        .update({ status: "disconnected", qr_code: null })
+        .eq("id", 1);
 
-      if (!res.ok) throw new Error("Failed to restart WhatsApp instance");
-      
-      const data = await res.json();
-      return api.whatsapp.restart.responses[200].parse(data);
+      if (error) throw new Error(error.message);
+      return { message: "WhatsApp reiniciado" };
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [api.whatsapp.status.path] });
+      queryClient.invalidateQueries({ queryKey: ["whatsapp_status"] });
       toast({
-        title: "WhatsApp Restarted",
-        description: "The bot instance is restarting and generating a new session.",
+        title: "WhatsApp Reiniciado",
+        description: "A instância do bot está reiniciando.",
       });
     },
     onError: (error) => {
       toast({
-        title: "Restart Failed",
-        description: error instanceof Error ? error.message : "Failed to restart",
+        title: "Falha ao Reiniciar",
+        description: error instanceof Error ? error.message : "Falha ao reiniciar",
         variant: "destructive",
       });
-    }
+    },
   });
 }
