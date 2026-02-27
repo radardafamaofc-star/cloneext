@@ -29,7 +29,6 @@ export function useRestartWhatsApp() {
 
   return useMutation({
     mutationFn: async () => {
-      // Reset status to disconnected in Supabase
       const { error } = await supabase
         .from("whatsapp_status")
         .update({ status: "disconnected", qr_code: null })
@@ -49,6 +48,37 @@ export function useRestartWhatsApp() {
       toast({
         title: "Falha ao Reiniciar",
         description: error instanceof Error ? error.message : "Falha ao reiniciar",
+        variant: "destructive",
+      });
+    },
+  });
+}
+
+export function useDisconnectWhatsApp() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase
+        .from("whatsapp_status")
+        .update({ status: "disconnected", qr_code: null })
+        .eq("id", 1);
+
+      if (error) throw new Error(error.message);
+      return { message: "WhatsApp desconectado" };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["whatsapp_status"] });
+      toast({
+        title: "WhatsApp Desconectado",
+        description: "O bot foi desconectado do WhatsApp.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Falha ao Desconectar",
+        description: error instanceof Error ? error.message : "Falha ao desconectar",
         variant: "destructive",
       });
     },

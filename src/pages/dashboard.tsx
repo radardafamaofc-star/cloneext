@@ -1,4 +1,4 @@
-import { useWhatsAppStatus, useRestartWhatsApp } from "@/hooks/use-whatsapp";
+import { useWhatsAppStatus, useRestartWhatsApp, useDisconnectWhatsApp } from "@/hooks/use-whatsapp";
 import { useLogs } from "@/hooks/use-logs";
 import { QRCodeSVG } from "qrcode.react";
 import { format } from "date-fns";
@@ -8,7 +8,10 @@ import {
   MessageSquare, 
   CheckCircle2, 
   XCircle, 
-  AlertCircle 
+  AlertCircle,
+  LogOut,
+  Wifi,
+  WifiOff
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -27,6 +30,7 @@ export default function Dashboard() {
   const { data: statusData, isLoading: statusLoading } = useWhatsAppStatus();
   const { data: logs, isLoading: logsLoading } = useLogs();
   const { mutate: restartWhatsApp, isPending: isRestarting } = useRestartWhatsApp();
+  const { mutate: disconnectWhatsApp, isPending: isDisconnecting } = useDisconnectWhatsApp();
 
   const renderStatusCard = () => {
     if (statusLoading) {
@@ -42,28 +46,28 @@ export default function Dashboard() {
             <div>
               <CardTitle className="flex items-center gap-2 text-xl font-display">
                 <Smartphone className="h-5 w-5 text-primary" />
-                WhatsApp Connection
+                Conexão WhatsApp
               </CardTitle>
               <CardDescription className="mt-1.5">
-                Manage your bot's connection to WhatsApp
+                Gerencie a conexão do bot com o WhatsApp
               </CardDescription>
             </div>
             {status === "connected" && (
-              <Badge className="bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20 border-emerald-500/20">
-                <CheckCircle2 className="w-3.5 h-3.5 mr-1.5" />
-                Connected
+              <Badge className="bg-primary/10 text-primary hover:bg-primary/20 border-primary/20">
+                <Wifi className="w-3.5 h-3.5 mr-1.5" />
+                Conectado
               </Badge>
             )}
             {status === "disconnected" && (
               <Badge variant="destructive" className="bg-destructive/10 text-destructive hover:bg-destructive/20 border-destructive/20">
-                <XCircle className="w-3.5 h-3.5 mr-1.5" />
-                Disconnected
+                <WifiOff className="w-3.5 h-3.5 mr-1.5" />
+                Desconectado
               </Badge>
             )}
             {status === "qr" && (
-              <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-500/20">
+              <Badge variant="outline" className="border-ring/30 bg-ring/10 text-foreground">
                 <AlertCircle className="w-3.5 h-3.5 mr-1.5 subtle-pulse" />
-                Action Required
+                Aguardando QR Code
               </Badge>
             )}
           </div>
@@ -72,23 +76,23 @@ export default function Dashboard() {
           {status === "qr" && statusData?.qrCode ? (
             <div className="flex flex-col items-center justify-center space-y-6 py-4">
               <div className="text-center space-y-2">
-                <h3 className="text-lg font-semibold text-foreground">Scan QR Code</h3>
+                <h3 className="text-lg font-semibold text-foreground">Escaneie o QR Code</h3>
                 <p className="text-sm text-muted-foreground max-w-sm">
-                  Open WhatsApp on your phone, tap Menu or Settings and select Linked Devices. Point your phone to this screen to capture the code.
+                  Abra o WhatsApp no seu celular, toque em Menu ou Configurações e selecione Aparelhos Conectados. Aponte a câmera para esta tela.
                 </p>
               </div>
-              <div className="p-4 bg-white rounded-2xl shadow-sm border border-border">
+              <div className="p-4 bg-card rounded-2xl shadow-sm border border-border">
                 <QRCodeSVG value={statusData.qrCode} size={200} level="H" includeMargin={false} />
               </div>
             </div>
           ) : status === "connected" ? (
             <div className="flex flex-col items-center justify-center py-8 text-center space-y-3">
-              <div className="h-16 w-16 bg-emerald-500/10 rounded-full flex items-center justify-center mb-2">
-                <CheckCircle2 className="h-8 w-8 text-emerald-500" />
+              <div className="h-16 w-16 bg-primary/10 rounded-full flex items-center justify-center mb-2">
+                <CheckCircle2 className="h-8 w-8 text-primary" />
               </div>
-              <h3 className="text-xl font-semibold text-foreground">Ready to Assist</h3>
+              <h3 className="text-xl font-semibold text-foreground">Bot Ativo e Funcionando</h3>
               <p className="text-muted-foreground max-w-md mx-auto">
-                Your AI sales assistant is actively listening and responding to messages.
+                Seu assistente de vendas está conectado e respondendo mensagens automaticamente.
               </p>
             </div>
           ) : (
@@ -96,23 +100,35 @@ export default function Dashboard() {
               <div className="h-16 w-16 bg-destructive/10 rounded-full flex items-center justify-center mb-2">
                 <XCircle className="h-8 w-8 text-destructive" />
               </div>
-              <h3 className="text-xl font-semibold text-foreground">Connection Lost</h3>
+              <h3 className="text-xl font-semibold text-foreground">Conexão Perdida</h3>
               <p className="text-muted-foreground max-w-md mx-auto">
-                The bot is currently disconnected from WhatsApp. Please restart the instance to generate a new login session.
+                O bot está desconectado do WhatsApp. Clique em "Reconectar" para gerar um novo QR Code.
               </p>
             </div>
           )}
 
-          <div className="mt-8 flex justify-center">
-            <Button 
-              onClick={() => restartWhatsApp()} 
-              disabled={isRestarting}
-              variant="outline"
-              className="w-full sm:w-auto"
-            >
-              <RefreshCw className={`mr-2 h-4 w-4 ${isRestarting ? 'animate-spin' : ''}`} />
-              {isRestarting ? "Restarting..." : "Restart Session"}
-            </Button>
+          <div className="mt-8 flex justify-center gap-3">
+            {status === "connected" ? (
+              <Button 
+                onClick={() => disconnectWhatsApp()} 
+                disabled={isDisconnecting}
+                variant="destructive"
+                className="w-full sm:w-auto"
+              >
+                <LogOut className={`mr-2 h-4 w-4 ${isDisconnecting ? 'animate-spin' : ''}`} />
+                {isDisconnecting ? "Desconectando..." : "Desconectar"}
+              </Button>
+            ) : (
+              <Button 
+                onClick={() => restartWhatsApp()} 
+                disabled={isRestarting}
+                variant="outline"
+                className="w-full sm:w-auto"
+              >
+                <RefreshCw className={`mr-2 h-4 w-4 ${isRestarting ? 'animate-spin' : ''}`} />
+                {isRestarting ? "Reconectando..." : "Reconectar"}
+              </Button>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -129,9 +145,9 @@ export default function Dashboard() {
         <CardHeader className="pb-4">
           <CardTitle className="flex items-center gap-2 text-lg font-display">
             <MessageSquare className="h-5 w-5 text-primary" />
-            Recent Activity
+            Atividade Recente
           </CardTitle>
-          <CardDescription>Latest conversations handled by the AI</CardDescription>
+          <CardDescription>Últimas conversas gerenciadas pela IA</CardDescription>
         </CardHeader>
         <CardContent>
           {logs && logs.length > 0 ? (
@@ -139,17 +155,17 @@ export default function Dashboard() {
               <Table>
                 <TableHeader className="bg-muted/50">
                   <TableRow>
-                    <TableHead className="w-[180px]">Date & Time</TableHead>
-                    <TableHead className="w-[150px]">Phone</TableHead>
-                    <TableHead className="w-[300px]">User Message</TableHead>
-                    <TableHead>Bot Response</TableHead>
+                    <TableHead className="w-[180px]">Data & Hora</TableHead>
+                    <TableHead className="w-[150px]">Telefone</TableHead>
+                    <TableHead className="w-[300px]">Mensagem</TableHead>
+                    <TableHead>Resposta do Bot</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {logs.map((log: { id: number; phoneNumber: string; message: string; response: string; createdAt: string | null }) => (
                     <TableRow key={log.id} className="hover:bg-muted/30">
                       <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
-                        {log.createdAt ? format(new Date(log.createdAt), "MMM d, h:mm a") : "Unknown"}
+                        {log.createdAt ? format(new Date(log.createdAt), "dd/MM, HH:mm") : "Desconhecido"}
                       </TableCell>
                       <TableCell className="font-medium text-sm">
                         {log.phoneNumber}
@@ -170,9 +186,9 @@ export default function Dashboard() {
           ) : (
             <div className="flex flex-col items-center justify-center py-12 text-center border border-dashed rounded-xl bg-muted/10">
               <MessageSquare className="h-10 w-10 text-muted-foreground/30 mb-4" />
-              <h3 className="text-lg font-medium text-foreground">No logs yet</h3>
+              <h3 className="text-lg font-medium text-foreground">Sem registros</h3>
               <p className="text-sm text-muted-foreground max-w-sm mt-1">
-                When users interact with your bot, the conversation history will appear here.
+                Quando os usuários interagirem com o bot, o histórico aparecerá aqui.
               </p>
             </div>
           )}
@@ -184,8 +200,8 @@ export default function Dashboard() {
   return (
     <div className="space-y-2 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight font-display text-foreground">Overview</h1>
-        <p className="text-muted-foreground mt-1">Monitor your AI sales assistant status and activity.</p>
+        <h1 className="text-3xl font-bold tracking-tight font-display text-foreground">Visão Geral</h1>
+        <p className="text-muted-foreground mt-1">Monitore o status e atividade do seu assistente de vendas.</p>
       </div>
       
       <div className="grid gap-6 pt-6 md:grid-cols-1">
