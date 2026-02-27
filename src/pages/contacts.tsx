@@ -49,8 +49,8 @@ export default function Contacts() {
   const exportCSV = () => {
     if (!contacts || contacts.length === 0) return;
     const header = "Telefone,Nome,Data\n";
-    const rows = contacts.map((c) =>
-      `${c.phone_number},"${c.name || ""}",${new Date(c.created_at).toLocaleDateString("pt-BR")}`
+    const rows = contacts.map((c, i) =>
+      `${c.phone_number},"${c.name || `Contato ${i + 1}`}",${new Date(c.created_at).toLocaleDateString("pt-BR")}`
     ).join("\n");
     const blob = new Blob([header + rows], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
