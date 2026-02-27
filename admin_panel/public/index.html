@@ -258,6 +258,7 @@
             const key = keyInput.value.trim();
             if (!key) return;
 
+            console.log('Tentando gerar token:', key);
             try {
                 const res = await fetch('/api/licenses', {
                     method: 'POST',
@@ -266,15 +267,22 @@
                 });
                 
                 if (res.ok) {
+                    console.log('Token gerado com sucesso');
                     keyInput.value = '';
                     loadLicenses();
+                } else {
+                    const errorText = await res.text();
+                    console.error('Erro do servidor:', errorText);
+                    alert('Erro ao gerar token: ' + errorText);
                 }
             } catch (e) {
-                alert('Erro ao gerar token');
+                console.error('Erro na requisição:', e);
+                alert('Erro ao gerar token: ' + e.message);
             }
         }
 
         function downloadExtension() {
+            console.log('Iniciando download da extensão...');
             window.location.href = '/api/download-extension';
         }
     </script>

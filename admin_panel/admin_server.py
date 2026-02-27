@@ -58,36 +58,56 @@ class AdminHandler(SimpleHTTPRequestHandler):
         elif self.path == '/api/download-extension':
             # Create a ZIP of the extension_v2 folder
             memory_file = io.BytesIO()
-            with zipfile.ZipFile(memory_file, 'w', zipfile.ZIP_DEFLATED) as zf:
-                extension_path = '../extension_v2'
-                for root, dirs, files in os.walk(extension_path):
-                    for file in files:
-                        file_path = os.path.join(root, file)
-                        # Archive name should be relative to extension_v2
-                        arcname = os.path.relpath(file_path, extension_path)
-                        zf.write(file_path, arcname)
-            
-            self.send_response(200)
-            self.send_header('Content-Type', 'application/zip')
-            self.send_header('Content-Disposition', 'attachment; filename=lovable_extension.zip')
-            self.end_headers()
-            self.wfile.write(memory_file.getvalue())
+            try:
+                with zipfile.ZipFile(memory_file, 'w', zipfile.ZIP_DEFLATED) as zf:
+                    # Use absolute path or ensure correct relative path from the script's directory
+                    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+                    extension_path = os.path.join(base_dir, 'extension_v2')
+                    
+                    if not os.path.exists(extension_path):
+                        raise FileNotFoundError(f"Directory not found: {extension_path}")
+                        
+                    for root, dirs, files in os.walk(extension_path):
+                        for file in files:
+                            file_path = os.path.join(root, file)
+                            arcname = os.path.relpath(file_path, extension_path)
+                            zf.write(file_path, arcname)
+                
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/zip')
+                self.send_header('Content-Disposition', 'attachment; filename=lovable_extension.zip')
+                self.end_headers()
+                self.wfile.write(memory_file.getvalue())
+            except Exception as e:
+                self.send_response(500)
+                self.send_header('Content-Type', 'text/plain')
+                self.end_headers()
+                self.wfile.write(f"Error creating zip: {str(e)}".encode())
         else:
             return super().do_GET()
 
     def do_POST(self):
         if self.path == '/api/licenses':
-            content_length = int(self.headers['Content-Length'])
+            content_length = int(self.headers.get('Content-Length', 0))
+            if content_length == 0:
+                self.send_response(400)
+                self.end_headers()
+                self.wfile.write(b'Empty body')
+                return
+
             post_data = self.rfile.read(content_length)
             try:
                 new_license = json.loads(post_data)
                 
-                if not os.path.exists('api'):
-                    os.makedirs('api')
+                # Ensure the 'api' directory exists relative to this script
+                api_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'api')
+                if not os.path.exists(api_dir):
+                    os.makedirs(api_dir)
                 
+                license_file = os.path.join(api_dir, 'licenses.json')
                 licenses = []
-                if os.path.exists('api/licenses.json'):
-                    with open('api/licenses.json', 'r') as f:
+                if os.path.exists(license_file):
+                    with open(license_file, 'r') as f:
                         try:
                             licenses = json.load(f)
                         except json.JSONDecodeError:
@@ -97,7 +117,7 @@ class AdminHandler(SimpleHTTPRequestHandler):
                 key_exists = any(l.get('key') == new_license.get('key') for l in licenses)
                 if not key_exists:
                     licenses.append(new_license)
-                    with open('api/licenses.json', 'w') as f:
+                    with open(license_file, 'w') as f:
                         json.dump(licenses, f)
                 
                 self.send_response(200)
@@ -105,9 +125,14 @@ class AdminHandler(SimpleHTTPRequestHandler):
                 self.end_headers()
                 self.wfile.write(json.dumps(new_license).encode())
             except Exception as e:
+                print(f"Error in do_POST: {e}")
                 self.send_response(500)
                 self.end_headers()
                 self.wfile.write(str(e).encode())
+        else:
+            self.send_response(404)
+            self.end_headers()
+            self.wfile.write(b'Not Found')
 
 if __name__ == '__main__':
     port = 8000
