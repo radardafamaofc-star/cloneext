@@ -8,8 +8,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Send, Users, Search, CheckSquare } from "lucide-react";
+import { Send, Users, Search, CheckSquare, Download, ShieldCheck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Slider } from "@/components/ui/slider";
 
 type Contact = {
   id: number;
@@ -24,6 +25,8 @@ export default function BulkSend() {
   const [selected, setSelected] = useState<Set<number>>(new Set());
   const [search, setSearch] = useState("");
   const [sending, setSending] = useState(false);
+  const [delay, setDelay] = useState(10); // seconds between each message
+  const [progress, setProgress] = useState({ current: 0, total: 0 });
 
   const { data: contacts, isLoading } = useQuery({
     queryKey: ["contacts-bulk"],
@@ -65,48 +68,80 @@ export default function BulkSend() {
     setSelected(next);
   };
 
+  const exportCSV = () => {
+    if (!contacts || contacts.length === 0) return;
+    const selectedContacts = contacts.filter((c) => selected.has(c.id));
+    const toExport = selectedContacts.length > 0 ? selectedContacts : contacts;
+    const header = "Telefone,Nome,Data\n";
+    const rows = toExport
+      .map(
+        (c, i) =>
+          `${c.phone_number},"${c.name || `Contato ${i + 1}`}",${new Date(c.created_at).toLocaleDateString("pt-BR")}`
+      )
+      .join("\n");
+    const blob = new Blob([header + rows], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `contatos_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast({ title: `${toExport.length} contato(s) exportado(s)` });
+  };
+
   const handleSend = async () => {
     if (selected.size === 0 || !message.trim()) return;
     setSending(true);
 
     const selectedContacts = contacts?.filter((c) => selected.has(c.id)) || [];
+    setProgress({ current: 0, total: selectedContacts.length });
 
-    // Store each as a scheduled message with status "pending" for the external bot to pick up
-    const rows = selectedContacts.map((c) => ({
+    // Schedule each message with incremental delay for safe sending
+    const now = new Date();
+    const rows = selectedContacts.map((c, i) => ({
       phone_number: c.phone_number,
       message: message.trim(),
-      scheduled_at: new Date().toISOString(),
+      scheduled_at: new Date(now.getTime() + i * delay * 1000).toISOString(),
       status: "pending",
     }));
 
     const { error } = await supabase.from("scheduled_messages").insert(rows);
 
     setSending(false);
+    setProgress({ current: 0, total: 0 });
 
     if (error) {
       toast({ title: "Erro ao enfileirar mensagens", variant: "destructive" });
     } else {
+      const totalTime = Math.round((selectedContacts.length * delay) / 60);
       toast({
         title: `${selectedContacts.length} mensagem(ns) enfileirada(s)`,
-        description: "As mensagens serão enviadas pelo bot automaticamente.",
+        description: `Intervalo de ${delay}s entre cada envio (~${totalTime} min total).`,
       });
       setSelected(new Set());
       setMessage("");
     }
   };
 
-  const allSelected = filtered && filtered.length > 0 && filtered.every((c) => selected.has(c.id));
+  const allSelected =
+    filtered && filtered.length > 0 && filtered.every((c) => selected.has(c.id));
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight font-display flex items-center gap-2">
-          <Send className="h-6 w-6 text-primary" />
-          Envio em Massa
-        </h1>
-        <p className="text-muted-foreground mt-1">
-          Selecione contatos e envie uma mensagem para todos de uma vez
-        </p>
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight font-display flex items-center gap-2">
+            <Send className="h-6 w-6 text-primary" />
+            Envio em Massa
+          </h1>
+          <p className="text-muted-foreground mt-1">
+            Selecione contatos e envie uma mensagem para todos de uma vez
+          </p>
+        </div>
+        <Button variant="outline" onClick={exportCSV} disabled={!contacts?.length}>
+          <Download className="h-4 w-4 mr-2" />
+          Exportar CSV
+        </Button>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[1fr_350px]">
@@ -115,9 +150,7 @@ export default function BulkSend() {
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-base">Contatos</CardTitle>
-              <Badge variant="secondary">
-                {selected.size} selecionado(s)
-              </Badge>
+              <Badge variant="secondary">{selected.size} selecionado(s)</Badge>
             </div>
             <div className="flex items-center gap-2 mt-2">
               <div className="relative flex-1">
@@ -137,11 +170,15 @@ export default function BulkSend() {
           </CardHeader>
           <CardContent>
             {isLoading ? (
-              <p className="text-sm text-muted-foreground text-center py-8">Carregando...</p>
+              <p className="text-sm text-muted-foreground text-center py-8">
+                Carregando...
+              </p>
             ) : !filtered?.length ? (
               <div className="flex flex-col items-center py-8">
                 <Users className="h-10 w-10 text-muted-foreground/40 mb-2" />
-                <p className="text-sm text-muted-foreground">Nenhum contato encontrado</p>
+                <p className="text-sm text-muted-foreground">
+                  Nenhum contato encontrado
+                </p>
               </div>
             ) : (
               <div className="max-h-[400px] overflow-y-auto space-y-1">
@@ -158,7 +195,9 @@ export default function BulkSend() {
                       <p className="text-sm font-medium truncate">
                         {c.name || `Contato ${i + 1}`}
                       </p>
-                      <p className="text-xs text-muted-foreground">{c.phone_number}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {c.phone_number}
+                      </p>
                     </div>
                   </label>
                 ))}
@@ -168,33 +207,75 @@ export default function BulkSend() {
         </Card>
 
         {/* Message composer */}
-        <Card className="h-fit">
-          <CardHeader>
-            <CardTitle className="text-base">Mensagem</CardTitle>
-            <CardDescription>A mesma mensagem será enviada para todos os contatos selecionados.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label>Texto da mensagem</Label>
-              <Textarea
-                placeholder="Digite a mensagem..."
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                rows={6}
+        <div className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Mensagem</CardTitle>
+              <CardDescription>
+                A mesma mensagem será enviada para todos os contatos selecionados.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label>Texto da mensagem</Label>
+                <Textarea
+                  placeholder="Digite a mensagem..."
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  rows={6}
+                />
+              </div>
+              <Button
+                className="w-full"
+                disabled={selected.size === 0 || !message.trim() || sending}
+                onClick={handleSend}
+              >
+                <Send className="h-4 w-4 mr-2" />
+                {sending
+                  ? "Enviando..."
+                  : `Enviar para ${selected.size} contato(s)`}
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Safe sending config */}
+          <Card className="border-primary/20 bg-primary/5">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm flex items-center gap-2">
+                <ShieldCheck className="h-4 w-4 text-primary" />
+                Envio Responsável
+              </CardTitle>
+              <CardDescription className="text-xs">
+                Intervalo entre cada mensagem para evitar bloqueio do WhatsApp.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex items-center justify-between">
+                <Label className="text-sm">Intervalo</Label>
+                <Badge variant="outline" className="font-mono">
+                  {delay}s
+                </Badge>
+              </div>
+              <Slider
+                value={[delay]}
+                onValueChange={([v]) => setDelay(v)}
+                min={5}
+                max={60}
+                step={5}
               />
-            </div>
-            <Button
-              className="w-full"
-              disabled={selected.size === 0 || !message.trim() || sending}
-              onClick={handleSend}
-            >
-              <Send className="h-4 w-4 mr-2" />
-              {sending
-                ? "Enviando..."
-                : `Enviar para ${selected.size} contato(s)`}
-            </Button>
-          </CardContent>
-        </Card>
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>5s (rápido)</span>
+                <span>60s (seguro)</span>
+              </div>
+              {selected.size > 0 && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  ⏱ Tempo estimado: ~{Math.ceil((selected.size * delay) / 60)} min
+                  para {selected.size} contato(s)
+                </p>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
