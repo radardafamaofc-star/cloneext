@@ -29,13 +29,15 @@ export function useRestartWhatsApp() {
 
   return useMutation({
     mutationFn: async () => {
+      // Set status to "qr" so the dashboard shows QR scanning state
+      // A real backend (server externo) should detect this and populate qr_code
       const { error } = await supabase
         .from("whatsapp_status")
-        .update({ status: "disconnected", qr_code: null })
+        .update({ status: "qr", qr_code: "whatsapp-bot-connect-" + Date.now() })
         .eq("id", 1);
 
       if (error) throw new Error(error.message);
-      return { message: "WhatsApp reiniciado" };
+      return { message: "Aguardando QR Code" };
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["whatsapp_status"] });
