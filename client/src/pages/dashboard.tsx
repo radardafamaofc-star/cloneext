@@ -146,7 +146,7 @@ export default function Dashboard() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {logs.map((log) => (
+                  {logs.map((log: { id: number; phoneNumber: string; message: string; response: string; createdAt: string | null }) => (
                     <TableRow key={log.id} className="hover:bg-muted/30">
                       <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
                         {log.createdAt ? format(new Date(log.createdAt), "MMM d, h:mm a") : "Unknown"}
