@@ -20,6 +20,19 @@ class AdminHandler(SimpleHTTPRequestHandler):
         self.end_headers()
 
     def do_GET(self):
+        # Serve the UI at the root
+        if self.path == '/' or self.path == '/index.html':
+            self.send_response(200)
+            self.send_header('Content-type', 'text/html')
+            self.end_headers()
+            try:
+                ui_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'public', 'index.html')
+                with open(ui_path, 'rb') as f:
+                    self.wfile.write(f.read())
+            except Exception as e:
+                self.wfile.write(f"Error loading UI: {e}".encode())
+            return
+
         if self.path == '/api/licenses':
             self.send_response(200)
             self.send_header('Content-type', 'application/json')

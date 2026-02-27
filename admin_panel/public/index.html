@@ -224,6 +224,12 @@
     </div>
 
     <script>
+        console.log('Admin Panel Script Initialized');
+        
+        // Ensure we use the correct port for API calls if we are on the main domain
+        const API_BASE = window.location.port === '8000' ? '' : (window.location.protocol + '//' + window.location.hostname + ':8000');
+        console.log('API Base URL:', API_BASE || 'Relative');
+
         function login() {
             const user = document.getElementById('username').value;
             const pass = document.getElementById('password').value;
@@ -238,7 +244,7 @@
 
         async function loadLicenses() {
             try {
-                const res = await fetch('/api/licenses');
+                const res = await fetch(API_BASE + '/api/licenses');
                 const data = await res.json();
                 const tbody = document.querySelector('#license-table tbody');
                 tbody.innerHTML = data.map(l => `
@@ -256,11 +262,14 @@
         async function addLicense() {
             const keyInput = document.getElementById('new-license-key');
             const key = keyInput.value.trim();
-            if (!key) return;
+            if (!key) {
+                alert('Por favor, insira uma chave');
+                return;
+            }
 
             console.log('Tentando gerar token:', key);
             try {
-                const res = await fetch('/api/licenses', {
+                const res = await fetch(API_BASE + '/api/licenses', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ key, status: 'active', expiry: '2026-12-31' })
@@ -268,6 +277,7 @@
                 
                 if (res.ok) {
                     console.log('Token gerado com sucesso');
+                    alert('Token gerado com sucesso!');
                     keyInput.value = '';
                     loadLicenses();
                 } else {
@@ -277,13 +287,14 @@
                 }
             } catch (e) {
                 console.error('Erro na requisição:', e);
-                alert('Erro ao gerar token: ' + e.message);
+                alert('Erro ao gerar token (verifique se o servidor na porta 8000 está rodando): ' + e.message);
             }
         }
 
         function downloadExtension() {
             console.log('Iniciando download da extensão...');
-            window.location.href = '/api/download-extension';
+            const url = API_BASE + '/api/download-extension';
+            window.location.href = url;
         }
     </script>
 </body>
