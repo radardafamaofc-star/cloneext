@@ -1,9 +1,9 @@
 import { useRef, useState } from "react";
-import { useContacts, useImportContacts, useDeleteContact, Contact } from "@/hooks/use-contacts";
+import { useContacts, useImportContacts, useImportFromChatLogs, useDeleteContact, Contact } from "@/hooks/use-contacts";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Upload, Trash2, Users, FileSpreadsheet } from "lucide-react";
+import { Upload, Trash2, Users, FileSpreadsheet, MessageSquare, Download } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -41,9 +41,25 @@ function parseCSV(text: string): { phone_number: string; name: string }[] {
 export default function Contacts() {
   const { data: contacts, isLoading } = useContacts();
   const { mutate: importContacts, isPending: isImporting } = useImportContacts();
+  const { mutate: importFromChat, isPending: isImportingChat } = useImportFromChatLogs();
   const { mutate: deleteContact } = useDeleteContact();
   const fileRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<{ phone_number: string; name: string }[] | null>(null);
+
+  const exportCSV = () => {
+    if (!contacts || contacts.length === 0) return;
+    const header = "Telefone,Nome,Data\n";
+    const rows = contacts.map((c) =>
+      `${c.phone_number},"${c.name || ""}",${new Date(c.created_at).toLocaleDateString("pt-BR")}`
+    ).join("\n");
+    const blob = new Blob([header + rows], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "contatos.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -80,7 +96,16 @@ export default function Contacts() {
             Importe contatos via CSV. Apenas números novos serão salvos.
           </p>
         </div>
-        <div>
+        <div className="flex gap-2 flex-wrap">
+          <Button
+            variant="outline"
+            onClick={() => importFromChat(undefined)}
+            disabled={isImportingChat}
+            className="shadow-sm"
+          >
+            <MessageSquare className="h-4 w-4 mr-2" />
+            {isImportingChat ? "Importando..." : "Importar do Bate-papo"}
+          </Button>
           <input
             ref={fileRef}
             type="file"
@@ -88,9 +113,14 @@ export default function Contacts() {
             className="hidden"
             onChange={handleFile}
           />
-          <Button onClick={() => fileRef.current?.click()} className="shadow-md">
+          <Button variant="outline" onClick={() => fileRef.current?.click()} className="shadow-sm">
             <Upload className="h-4 w-4 mr-2" /> Importar CSV
           </Button>
+          {contacts && contacts.length > 0 && (
+            <Button variant="outline" onClick={exportCSV} className="shadow-sm">
+              <Download className="h-4 w-4 mr-2" /> Exportar CSV
+            </Button>
+          )}
         </div>
       </div>
 
