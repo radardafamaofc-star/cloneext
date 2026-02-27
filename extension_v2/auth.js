@@ -1,1 +1,57 @@
-const _0x4d5518 = _0x448a; (function (_0x14dfd7, _0x212386) { const _0xbdf984 = _0x448a, _0x4ee71b = _0x14dfd7(); while (!![]) { try { const _0x1c3ab2 = -parseInt(_0xbdf984(0xd5)) / 0x1 * (-parseInt(_0xbdf984(0xcd)) / 0x2) + parseInt(_0xbdf984(0xc6)) / 0x3 * (parseInt(_0xbdf984(0xc7)) / 0x4) + parseInt(_0xbdf984(0xcf)) / 0x5 + -parseInt(_0xbdf984(0xd8)) / 0x6 + parseInt(_0xbdf984(0xee)) / 0x7 * (-parseInt(_0xbdf984(0xd0)) / 0x8) + parseInt(_0xbdf984(0xbe)) / 0x9 * (parseInt(_0xbdf984(0xe8)) / 0xa) + -parseInt(_0xbdf984(0xcc)) / 0xb * (parseInt(_0xbdf984(0xe6)) / 0xc); if (_0x1c3ab2 === _0x212386) break; else _0x4ee71b['push'](_0x4ee71b['shift']()); } catch (_0x363362) { _0x4ee71b['push'](_0x4ee71b['shift']()); } } }(_0x29c5, 0x75913)); function _0x448a(_0x25b8a9, _0x37cf94) { _0x25b8a9 = _0x25b8a9 - 0xbc; const _0x29c5c0 = _0x29c5(); let _0x448a63 = _0x29c5c0[_0x25b8a9]; return _0x448a63; } function _0x29c5() { const _0x1cd160 = ['7833110OLOnfI', 'preventDefault', 'show', '\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<path\x20d=\x22M17.94\x2017.94A10.07\x2010.07\x200\x200\x201\x2012\x2020c-7\x200-11-8-11-8a18.45\x2018.45\x200\x200\x201\x205.06-5.94M9.9\x204.24A9.12\x209.12\x200\x200\x201\x2012\x204c7\x200\x2011\x208\x2011\x208a18.5\x2018.5\x200\x200\x201-2.16\x203.19m-6.72-1.07a3\x203\x200\x201\x201-4.24-4.24\x22></path>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<line\x20x1=\x221\x22\x20y1=\x221\x22\x20x2=\x2223\x22\x20y2=\x2223\x22></line>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20', 'style', 'block', '5691DbYdMC', 'sessionToken', 'local', 'eye-icon', 'location', '9aECVvz', 'error-message', 'trim', 'message', 'loading-spinner', 'click', 'type', 'userData', '229209uxnyEG', '12EjgBoR', 'remove', 'innerHTML', 'submit', 'href', '253IJPYvc', '578ogTMlG', 'textContent', '4582020XeWIYn', '808eIGUtM', 'add', 'classList', 'display', 'Por\x20favor,\x20insira\x20uma\x20chave\x20de\x20licença', '124zTbJUt', 'getElementById', '\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<path\x20d=\x22M1\x2012s4-8\x2011-8\x2011\x208\x2011\x208-4\x208-11\x208-11-8-11-8z\x22></path>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<circle\x20cx=\x2212\x22\x20cy=\x2212\x22\x20r=\x223\x22></circle>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20', '3335466dadhHi', 'button-text', 'toggle-visibility', 'success-message', 'popup.html', 'storage', 'toISOString', 'value', 'addEventListener', 'auth-button', 'none', 'password', 'disabled', 'focus', '440964qbBucN', 'text']; _0x29c5 = function () { return _0x1cd160; }; return _0x29c5(); } const SVG_EYE_OPEN = _0x4d5518(0xd7), SVG_EYE_CLOSED = _0x4d5518(0xeb); document[_0x4d5518(0xe0)]('DOMContentLoaded', () => { const _0x30c2cb = _0x4d5518, _0x2cc2b1 = document[_0x30c2cb(0xd6)]('auth-form'), _0x54c9c6 = document[_0x30c2cb(0xd6)]('license-key'), _0x507a8a = document[_0x30c2cb(0xd6)](_0x30c2cb(0xe1)), _0x416c80 = document[_0x30c2cb(0xd6)](_0x30c2cb(0xc2)), _0x4e58dc = document['getElementById'](_0x30c2cb(0xd9)), _0x5cbe83 = document[_0x30c2cb(0xd6)](_0x30c2cb(0xbf)), _0x175171 = document[_0x30c2cb(0xd6)](_0x30c2cb(0xdb)), _0x232344 = document['getElementById'](_0x30c2cb(0xda)), _0x4cd423 = document[_0x30c2cb(0xd6)](_0x30c2cb(0xbc)); _0x232344[_0x30c2cb(0xe0)](_0x30c2cb(0xc3), () => { const _0x2ce782 = _0x30c2cb, _0x588f94 = _0x54c9c6[_0x2ce782(0xc4)] === _0x2ce782(0xe3) ? _0x2ce782(0xe7) : _0x2ce782(0xe3); _0x54c9c6['type'] = _0x588f94, _0x588f94 === _0x2ce782(0xe7) ? _0x4cd423[_0x2ce782(0xc9)] = SVG_EYE_CLOSED : _0x4cd423[_0x2ce782(0xc9)] = SVG_EYE_OPEN; }); function _0x1f073c() { const _0x1f8bb6 = _0x30c2cb; _0x5cbe83['classList']['remove'](_0x1f8bb6(0xea)), _0x175171['classList'][_0x1f8bb6(0xc8)](_0x1f8bb6(0xea)); } function _0x5f2a4e(_0x2c7ed6) { const _0x46660f = _0x30c2cb; _0x1f073c(), _0x5cbe83[_0x46660f(0xce)] = _0x2c7ed6, _0x5cbe83['classList'][_0x46660f(0xd1)](_0x46660f(0xea)); } function _0x3512bb(_0x477499) { const _0x5901ae = _0x30c2cb; _0x1f073c(), _0x175171['textContent'] = _0x477499, _0x175171[_0x5901ae(0xd2)]['add'](_0x5901ae(0xea)); } function _0x26494d(_0x38c2f5) { const _0x3f9ce1 = _0x30c2cb; _0x38c2f5 ? (_0x507a8a[_0x3f9ce1(0xe4)] = !![], _0x416c80[_0x3f9ce1(0xec)][_0x3f9ce1(0xd3)] = _0x3f9ce1(0xed), _0x4e58dc[_0x3f9ce1(0xec)]['display'] = _0x3f9ce1(0xe2)) : (_0x507a8a[_0x3f9ce1(0xe4)] = ![], _0x416c80[_0x3f9ce1(0xec)]['display'] = _0x3f9ce1(0xe2), _0x4e58dc[_0x3f9ce1(0xec)][_0x3f9ce1(0xd3)] = _0x3f9ce1(0xed)); } async function _0x15688d(_0xc71b79) { const _0x43b994 = _0x30c2cb; return await validateKeySecure(_0xc71b79[_0x43b994(0xc0)]()); } _0x2cc2b1[_0x30c2cb(0xe0)](_0x30c2cb(0xca), async _0x1aad0f => { const _0x425383 = _0x30c2cb; _0x1aad0f[_0x425383(0xe9)](), _0x1f073c(); const _0x33b4a0 = _0x54c9c6[_0x425383(0xdf)][_0x425383(0xc0)](); if (!_0x33b4a0) { _0x5f2a4e(_0x425383(0xd4)); return; } _0x26494d(!![]), await new Promise(_0x308e49 => setTimeout(_0x308e49, 0x1f4)); const _0x45555c = await validateKeySecure(_0x33b4a0, !![]); _0x26494d(![]), _0x45555c['valid'] ? (_0x3512bb(_0x45555c[_0x425383(0xc1)]), await chrome[_0x425383(0xdd)][_0x425383(0xf0)]['set']({ 'licenseKey': _0x33b4a0, 'isAuthenticated': !![], 'authTimestamp': new Date()[_0x425383(0xde)](), 'userData': _0x45555c[_0x425383(0xc5)] || {}, 'sessionToken': _0x45555c[_0x425383(0xef)] }), setTimeout(() => { const _0x5bd485 = _0x425383; window[_0x5bd485(0xbd)][_0x5bd485(0xcb)] = _0x5bd485(0xdc); }, 0x3e8)) : (_0x5f2a4e(_0x45555c[_0x425383(0xc1)]), _0x54c9c6[_0x425383(0xdf)] = '', _0x54c9c6[_0x425383(0xe5)]()); }), _0x54c9c6[_0x30c2cb(0xe5)](); });
+async function login(licenseKey) {
+    const errorMessage = document.getElementById('error-message');
+    const loadingSpinner = document.getElementById('loading-spinner');
+    
+    if (!licenseKey) {
+        errorMessage.textContent = 'Por favor, insira uma chave de licença';
+        errorMessage.classList.add('show');
+        return;
+    }
+
+    errorMessage.classList.remove('show');
+    loadingSpinner.classList.add('show');
+
+    try {
+        const response = await fetch(`${CONFIG.FUNCTION_URL}/${licenseKey}`);
+        const data = await response.json();
+
+        if (data.valid) {
+            chrome.storage.local.set({
+                'sessionToken': data.sessionToken,
+                'userData': { license: licenseKey, active: true }
+            }, () => {
+                window.location.href = 'popup.html';
+            });
+        } else {
+            errorMessage.textContent = 'Chave de licença inválida ou expirada';
+            errorMessage.classList.add('show');
+        }
+    } catch (error) {
+        console.error('Login error:', error);
+        errorMessage.textContent = 'Erro ao conectar com o servidor';
+        errorMessage.classList.add('show');
+    } finally {
+        loadingSpinner.classList.remove('show');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const authForm = document.getElementById('auth-form');
+    const licenseInput = document.getElementById('license-key');
+    const eyeIcon = document.getElementById('eye-icon');
+
+    if (authForm) {
+        authForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            login(licenseInput.value.trim());
+        });
+    }
+
+    if (eyeIcon) {
+        eyeIcon.addEventListener('click', () => {
+            const type = licenseInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            licenseInput.setAttribute('type', type);
+            // Toggle eye icon SVG here if needed
+        });
+    }
+});
