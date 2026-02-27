@@ -98,6 +98,27 @@ export type Database = {
         }
         Relationships: []
       }
+      contacts: {
+        Row: {
+          created_at: string
+          id: number
+          name: string | null
+          phone_number: string
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          name?: string | null
+          phone_number: string
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          name?: string | null
+          phone_number?: string
+        }
+        Relationships: []
+      }
       whatsapp_status: {
         Row: {
           id: number

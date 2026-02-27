@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Bot, LayoutDashboard, Settings as SettingsIcon, Zap } from "lucide-react";
+import { Bot, LayoutDashboard, Settings as SettingsIcon, Zap, Users } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -17,6 +17,7 @@ import {
 const navigation = [
   { name: "Painel", href: "/", icon: LayoutDashboard },
   { name: "Atalhos", href: "/shortcuts", icon: Zap },
+  { name: "Contatos", href: "/contacts", icon: Users },
   { name: "Configurações", href: "/settings", icon: SettingsIcon },
 ];
 
