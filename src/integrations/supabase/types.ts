@@ -119,6 +119,33 @@ export type Database = {
         }
         Relationships: []
       }
+      scheduled_messages: {
+        Row: {
+          created_at: string
+          id: number
+          message: string
+          phone_number: string
+          scheduled_at: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          message: string
+          phone_number: string
+          scheduled_at: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          message?: string
+          phone_number?: string
+          scheduled_at?: string
+          status?: string
+        }
+        Relationships: []
+      }
       whatsapp_status: {
         Row: {
           id: number
