@@ -11,7 +11,8 @@ import {
   AlertCircle,
   LogOut,
   Wifi,
-  WifiOff
+  WifiOff,
+  Loader2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -70,6 +71,12 @@ export default function Dashboard() {
                 Aguardando QR Code
               </Badge>
             )}
+            {status === "connecting" && (
+              <Badge variant="outline" className="border-ring/30 bg-ring/10 text-foreground">
+                <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
+                Conectando...
+              </Badge>
+            )}
           </div>
         </CardHeader>
         <CardContent className="p-6">
@@ -95,6 +102,16 @@ export default function Dashboard() {
                 Seu assistente de vendas está conectado e respondendo mensagens automaticamente.
               </p>
             </div>
+          ) : status === "connecting" ? (
+            <div className="flex flex-col items-center justify-center py-8 text-center space-y-3">
+              <div className="h-16 w-16 bg-muted rounded-full flex items-center justify-center mb-2">
+                <Loader2 className="h-8 w-8 text-primary animate-spin" />
+              </div>
+              <h3 className="text-xl font-semibold text-foreground">Conectando...</h3>
+              <p className="text-muted-foreground max-w-md mx-auto">
+                Aguardando o servidor gerar o QR Code. Certifique-se que o servidor externo está rodando.
+              </p>
+            </div>
           ) : (
             <div className="flex flex-col items-center justify-center py-8 text-center space-y-3">
               <div className="h-16 w-16 bg-destructive/10 rounded-full flex items-center justify-center mb-2">
@@ -102,7 +119,7 @@ export default function Dashboard() {
               </div>
               <h3 className="text-xl font-semibold text-foreground">Conexão Perdida</h3>
               <p className="text-muted-foreground max-w-md mx-auto">
-                O bot está desconectado do WhatsApp. Clique em "Reconectar" para gerar um novo QR Code.
+                O bot está desconectado do WhatsApp. Clique em "Reconectar" para solicitar uma nova sessão.
               </p>
             </div>
           )}

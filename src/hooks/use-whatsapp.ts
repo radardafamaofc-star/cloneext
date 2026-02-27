@@ -15,7 +15,7 @@ export function useWhatsAppStatus() {
       if (error) throw new Error(error.message);
 
       return {
-        status: (data.status as "connected" | "disconnected" | "qr") || "disconnected",
+        status: (data.status as "connected" | "disconnected" | "qr" | "connecting") || "disconnected",
         qrCode: data.qr_code || undefined,
       };
     },
@@ -29,27 +29,26 @@ export function useRestartWhatsApp() {
 
   return useMutation({
     mutationFn: async () => {
-      // Set status to "qr" so the dashboard shows QR scanning state
-      // A real backend (server externo) should detect this and populate qr_code
+      // Reset to disconnected - the external server will detect and start a new connection
       const { error } = await supabase
         .from("whatsapp_status")
-        .update({ status: "qr", qr_code: "whatsapp-bot-connect-" + Date.now() })
+        .update({ status: "connecting", qr_code: null })
         .eq("id", 1);
 
       if (error) throw new Error(error.message);
-      return { message: "Aguardando QR Code" };
+      return { message: "Solicitação de reconexão enviada" };
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["whatsapp_status"] });
       toast({
-        title: "WhatsApp Reiniciado",
-        description: "A instância do bot está reiniciando.",
+        title: "Reconectando...",
+        description: "Aguardando o servidor gerar um novo QR Code.",
       });
     },
     onError: (error) => {
       toast({
-        title: "Falha ao Reiniciar",
-        description: error instanceof Error ? error.message : "Falha ao reiniciar",
+        title: "Falha ao Reconectar",
+        description: error instanceof Error ? error.message : "Falha ao reconectar",
         variant: "destructive",
       });
     },
