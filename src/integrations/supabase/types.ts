@@ -50,6 +50,30 @@ export type Database = {
         }
         Relationships: []
       }
+      bot_shortcuts: {
+        Row: {
+          answer: string
+          created_at: string
+          id: number
+          is_active: boolean
+          question: string
+        }
+        Insert: {
+          answer: string
+          created_at?: string
+          id?: number
+          is_active?: boolean
+          question: string
+        }
+        Update: {
+          answer?: string
+          created_at?: string
+          id?: number
+          is_active?: boolean
+          question?: string
+        }
+        Relationships: []
+      }
       chat_logs: {
         Row: {
           created_at: string | null
