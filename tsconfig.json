@@ -17,18 +17,9 @@
     "noFallthroughCasesInSwitch": true,
     "baseUrl": ".",
     "paths": {
-<<<<<<< HEAD
-      "@/*": ["./src/*"],
-      "@shared/*": ["./shared/*"]
-    },
-    "types": ["vite/client"]
-  },
-  "include": ["src", "server", "shared"]
-=======
       "@/*": ["./src/*"]
     },
     "types": ["vite/client"]
   },
   "include": ["src"]
->>>>>>> e3fd1b4d313c26a6313701959086485dcf57776b
 }

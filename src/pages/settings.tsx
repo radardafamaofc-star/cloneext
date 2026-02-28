@@ -13,10 +13,6 @@ import { Bot, Save } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const formSchema = z.object({
-<<<<<<< HEAD
-  groqApiKey: z.string().min(1, "A chave da API é obrigatória"),
-=======
->>>>>>> e3fd1b4d313c26a6313701959086485dcf57776b
   systemPrompt: z.string().min(10, "O prompt deve ter pelo menos 10 caracteres"),
   isActive: z.boolean().default(false),
   companyName: z.string().optional(),

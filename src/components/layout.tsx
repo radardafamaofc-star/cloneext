@@ -1,9 +1,5 @@
 import { Link, useLocation } from "wouter";
-<<<<<<< HEAD
-import { Bot, LayoutDashboard, Settings as SettingsIcon, Zap, Users, CalendarClock, Send, Download } from "lucide-react";
-=======
 import { Bot, LayoutDashboard, Settings as SettingsIcon, Zap, Users, CalendarClock, Send } from "lucide-react";
->>>>>>> e3fd1b4d313c26a6313701959086485dcf57776b
 import {
   Sidebar,
   SidebarContent,
@@ -62,17 +58,6 @@ export function AppSidebar() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
-              <SidebarMenuItem>
-                <SidebarMenuButton 
-                  asChild
-                  tooltip="Baixar Extensão"
-                >
-                  <a href="/extension.tar" download className="flex items-center gap-3">
-                    <Download className="h-4 w-4" />
-                    <span className="font-medium">Baixar Extensão</span>
-                  </a>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
