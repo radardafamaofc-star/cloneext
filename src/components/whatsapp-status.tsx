@@ -96,7 +96,7 @@ export function WhatsAppStatus() {
           variant="outline" 
           className="mt-8 gap-2"
           onClick={() => restartMutation.mutate()}
-          disabled={restartMutation.isPending || status?.status === 'connecting'}
+          disabled={restartMutation.isPending}
         >
           {restartMutation.isPending ? (
             <Loader2 className="h-4 w-4 animate-spin" />
