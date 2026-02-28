@@ -1,11 +1,4 @@
-"use client"
-
-import * as React from "react"
-import { Slot } from "@radix-ui/react-slot"
-import { cva, VariantProps } from "class-variance-authority"
-import { PanelLeftIcon } from "lucide-react"
-
-import { useIsMobile } from "@/hooks/use-mobile"
+import { useLocation, Link } from "wouter"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -164,6 +157,50 @@ function Sidebar({
   collapsible?: "offcanvas" | "icon" | "none"
 }) {
   const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
+  const [location] = useLocation()
+
+  const items = [
+    { title: "Painel", url: "/", icon: LayoutDashboard },
+    { title: "Atalhos", url: "/shortcuts", icon: Zap },
+    { title: "Contatos", url: "/contacts", icon: Users },
+    { title: "Agendamentos", url: "/scheduled", icon: Calendar },
+    { title: "Envio em Massa", url: "/bulk-send", icon: Send },
+    { title: "Configurações", url: "/settings", icon: Settings },
+  ]
+
+  const sidebarContent = (
+    <div className="flex flex-col h-full">
+      <SidebarHeader className="p-4 border-b">
+        <h2 className="text-xl font-bold text-primary">GroqBot</h2>
+      </SidebarHeader>
+      <SidebarContent className="flex-1">
+        <SidebarMenu className="p-2 space-y-1">
+          {items.map((item) => (
+            <SidebarMenuItem key={item.title}>
+              <SidebarMenuButton asChild isActive={location === item.url} tooltip={item.title}>
+                <Link href={item.url} className="flex items-center gap-3 px-3 py-2 rounded-md transition-colors">
+                  <item.icon className="h-5 w-5" />
+                  <span className="font-medium">{item.title}</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          ))}
+          <SidebarSeparator className="my-2" />
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild tooltip="Baixar Extensão">
+              <a href="/extension.tar.gz" download className="flex items-center gap-3 px-3 py-2 rounded-md transition-colors text-blue-600 hover:bg-blue-50">
+                <Chrome className="h-5 w-5" />
+                <span className="font-medium">Download Extensão</span>
+              </a>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarContent>
+      <SidebarFooter className="p-4 border-t text-xs text-muted-foreground text-center">
+        GroqBot v1.0
+      </SidebarFooter>
+    </div>
+  )
 
   if (collapsible === "none") {
     return (
@@ -175,7 +212,7 @@ function Sidebar({
         )}
         {...props}
       >
-        {children}
+        {sidebarContent}
       </div>
     )
   }
@@ -199,7 +236,7 @@ function Sidebar({
             <SheetTitle>Sidebar</SheetTitle>
             <SheetDescription>Displays the mobile sidebar.</SheetDescription>
           </SheetHeader>
-          <div className="flex h-full w-full flex-col">{children}</div>
+          <div className="flex h-full w-full flex-col">{sidebarContent}</div>
         </SheetContent>
       </Sheet>
     )
@@ -214,7 +251,6 @@ function Sidebar({
       data-side={side}
       data-slot="sidebar"
     >
-      {/* This is what handles the sidebar gap on desktop */}
       <div
         data-slot="sidebar-gap"
         className={cn(
@@ -233,7 +269,6 @@ function Sidebar({
           side === "left"
             ? "left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]"
             : "right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]",
-          // Adjust the padding for floating and inset variants.
           variant === "floating" || variant === "inset"
             ? "p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+var(--spacing-4)+2px)]"
             : "group-data-[collapsible=icon]:w-[var(--sidebar-width-icon)] group-data-[side=left]:border-r group-data-[side=right]:border-l",
@@ -246,7 +281,7 @@ function Sidebar({
           data-slot="sidebar-inner"
           className="bg-sidebar group-data-[variant=floating]:border-sidebar-border flex h-full w-full flex-col group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:shadow-sm"
         >
-          {children}
+          {sidebarContent}
         </div>
       </div>
     </div>

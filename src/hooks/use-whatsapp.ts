@@ -1,23 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
 export function useWhatsAppStatus() {
   return useQuery({
     queryKey: ["whatsapp_status"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("whatsapp_status")
-        .select("*")
-        .limit(1)
-        .single();
-
-      if (error) throw new Error(error.message);
-
-      return {
-        status: (data.status as "connected" | "disconnected" | "qr" | "connecting") || "disconnected",
-        qrCode: data.qr_code || undefined,
-      };
+      const response = await fetch("/api/whatsapp/status");
+      if (!response.ok) throw new Error("Failed to fetch WhatsApp status");
+      return response.json();
     },
     refetchInterval: 3000,
   });
@@ -29,14 +19,9 @@ export function useRestartWhatsApp() {
 
   return useMutation({
     mutationFn: async () => {
-      // Reset to disconnected - the external server will detect and start a new connection
-      const { error } = await supabase
-        .from("whatsapp_status")
-        .update({ status: "connecting", qr_code: null })
-        .eq("id", 1);
-
-      if (error) throw new Error(error.message);
-      return { message: "Solicitação de reconexão enviada" };
+      const response = await fetch("/api/whatsapp/restart", { method: "POST" });
+      if (!response.ok) throw new Error("Failed to restart WhatsApp");
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["whatsapp_status"] });
@@ -61,13 +46,9 @@ export function useDisconnectWhatsApp() {
 
   return useMutation({
     mutationFn: async () => {
-      const { error } = await supabase
-        .from("whatsapp_status")
-        .update({ status: "disconnected", qr_code: null })
-        .eq("id", 1);
-
-      if (error) throw new Error(error.message);
-      return { message: "WhatsApp desconectado" };
+      const response = await fetch("/api/whatsapp/restart", { method: "POST" }); // For simplicity, restart clears session
+      if (!response.ok) throw new Error("Failed to disconnect WhatsApp");
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["whatsapp_status"] });
