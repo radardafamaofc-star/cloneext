@@ -23,23 +23,45 @@ export async function connectToWhatsApp() {
     
     sock.ev.on('creds.update', saveCreds);
     
-    sock.ev.on('connection.update', (update) => {
+    sock.ev.on('connection.update', async (update) => {
         const { connection, lastDisconnect, qr } = update;
         
         if (qr) {
+            console.log('New QR Code generated');
             currentQr = qr;
             connectionStatus = 'qr';
         }
         
         if (connection === 'close') {
-            const shouldReconnect = (lastDisconnect?.error as Boom)?.output?.statusCode !== DisconnectReason.loggedOut;
-            console.log('connection closed due to ', lastDisconnect?.error, ', reconnecting ', shouldReconnect);
-            connectionStatus = 'disconnected';
+            const statusCode = (lastDisconnect?.error as Boom)?.output?.statusCode;
+            const shouldReconnect = statusCode !== DisconnectReason.loggedOut;
+            console.log('Connection closed. Status:', statusCode, 'Last error:', lastDisconnect?.error);
+            
             currentQr = undefined;
+            connectionStatus = 'disconnected';
+
+            if (statusCode === 401) {
+                console.log('Authentication failed (401). Clearing session data...');
+                // Internal cleanup of auth state is handled by Baileys if we don't provide valid creds
+                // but clearing the directory is the most reliable way to reset.
+                try {
+                    const fs = await import('fs');
+                    const path = await import('path');
+                    const authDir = 'baileys_auth_info';
+                    if (fs.existsSync(authDir)) {
+                        const files = fs.readdirSync(authDir);
+                        for (const file of files) {
+                            fs.unlinkSync(path.join(authDir, file));
+                        }
+                    }
+                } catch (e) {
+                    console.error('Error clearing auth dir:', e);
+                }
+            }
+
             if (shouldReconnect) {
-                connectToWhatsApp();
-            } else {
-                // Logout happened
+                console.log('Attempting to reconnect...');
+                setTimeout(() => connectToWhatsApp(), 3000);
             }
         } else if (connection === 'open') {
             console.log('opened connection');
