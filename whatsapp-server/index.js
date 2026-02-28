@@ -177,6 +177,60 @@ Regras:
   });
 }
 
+// ── Scheduled Messages Processor ──
+async function processScheduledMessages() {
+  if (!sock || currentStatus !== 'connected') return;
+
+  try {
+    const now = new Date().toISOString();
+    const { data: pending, error } = await supabase
+      .from('scheduled_messages')
+      .select('*')
+      .eq('status', 'pending')
+      .lte('scheduled_at', now)
+      .order('scheduled_at', { ascending: true })
+      .limit(10);
+
+    if (error || !pending || pending.length === 0) return;
+
+    for (const msg of pending) {
+      try {
+        // Format phone number for WhatsApp (ensure @s.whatsapp.net suffix)
+        let jid = msg.phone_number;
+        // Remove non-numeric chars
+        jid = jid.replace(/[^0-9]/g, '');
+        if (!jid.includes('@')) {
+          jid = jid + '@s.whatsapp.net';
+        }
+
+        await sock.sendMessage(jid, { text: msg.message });
+        
+        await supabase
+          .from('scheduled_messages')
+          .update({ status: 'sent' })
+          .eq('id', msg.id);
+        
+        console.log(`📤 Mensagem agendada enviada para ${msg.phone_number}`);
+        
+        // Small delay between messages to avoid rate limiting
+        await new Promise(resolve => setTimeout(resolve, 2000));
+      } catch (sendError) {
+        console.error(`❌ Falha ao enviar para ${msg.phone_number}:`, sendError.message);
+        await supabase
+          .from('scheduled_messages')
+          .update({ status: 'failed' })
+          .eq('id', msg.id);
+      }
+    }
+  } catch (e) {
+    console.error('Erro no processador de mensagens agendadas:', e.message);
+  }
+}
+
+// Track connection status for the processor
+let currentStatus = 'disconnected';
+const originalUpdateStatus = updateStatus;
+
 // ── Monitor for reconnect requests from dashboard ──
 let isConnecting = false;
 
@@ -188,6 +242,8 @@ async function monitorDashboardCommands() {
         .select('status')
         .eq('id', 1)
         .single();
+
+      currentStatus = data?.status || 'disconnected';
 
       if (data?.status === 'connecting' && !isConnecting) {
         console.log('📡 Reconexão solicitada pelo painel. Iniciando...');
@@ -210,3 +266,7 @@ console.log('🚀 WhatsApp Bot Server iniciando...');
 console.log(`📡 Supabase: ${supabaseUrl}`);
 connectToWhatsApp();
 monitorDashboardCommands();
+
+// Process scheduled messages every 5 seconds
+setInterval(processScheduledMessages, 5000);
+console.log('📅 Processador de mensagens agendadas ativado (a cada 5s).');
