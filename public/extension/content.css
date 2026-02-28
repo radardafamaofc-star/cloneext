@@ -1,0 +1,8 @@
+/* GroqBot Extension - Content Styles */
+#groqbot-sidebar {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+#groqbot-toggle:active {
+  transform: translateY(-50%) scale(0.95);
+}
