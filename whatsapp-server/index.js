@@ -178,20 +178,31 @@ Regras:
 }
 
 // ── Monitor for reconnect requests from dashboard ──
-async function monitorDashboardCommands() {
-  // Poll the whatsapp_status table every 5s for manual reconnect requests
-  setInterval(async () => {
-    const { data } = await supabase
-      .from('whatsapp_status')
-      .select('status')
-      .eq('id', 1)
-      .single();
+let isConnecting = false;
 
-    if (data?.status === 'disconnected' && sock) {
-      // Check if the dashboard user requested a disconnect
-      // The server will just keep running and wait for a reconnect
+async function monitorDashboardCommands() {
+  setInterval(async () => {
+    try {
+      const { data } = await supabase
+        .from('whatsapp_status')
+        .select('status')
+        .eq('id', 1)
+        .single();
+
+      if (data?.status === 'connecting' && !isConnecting) {
+        console.log('📡 Reconexão solicitada pelo painel. Iniciando...');
+        isConnecting = true;
+        if (sock) {
+          try { sock.end(undefined); } catch (_) {}
+          sock = null;
+        }
+        await connectToWhatsApp();
+        isConnecting = false;
+      }
+    } catch (e) {
+      console.error('Erro no monitor:', e.message);
     }
-  }, 5000);
+  }, 3000);
 }
 
 // ── Start ──
