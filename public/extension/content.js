@@ -433,56 +433,64 @@ function renderBody() {
 
 // ===== PAGE: Painel (clean - no activity logs) =====
 function renderPainel(body) {
-  const dotClass = currentStatus === "connected" ? "gb-dot-connected"
-    : currentStatus === "qr" ? "gb-dot-qr"
-    : currentStatus === "connecting" ? "gb-dot-connecting"
-    : "gb-dot-disconnected";
-
-  const statusLabel = currentStatus === "connected" ? "Conectado"
-    : currentStatus === "qr" ? "QR Code Disponível"
-    : currentStatus === "connecting" ? "Conectando..."
-    : "Desconectado";
-
-  const statusSub = currentStatus === "connected" ? "Bot respondendo mensagens"
-    : currentStatus === "qr" ? "Escaneie o QR Code"
-    : currentStatus === "connecting" ? "Aguardando QR Code..."
-    : "Clique em Conectar";
-
   let statusContent = "";
   if (currentStatus === "qr" && currentQr) {
-    statusContent = `<div class="gb-qr-container">
-      <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(currentQr)}" alt="QR" />
-      <div class="gb-qr-text">WhatsApp → Aparelhos conectados → Escanear</div>
-    </div>`;
+    statusContent = `
+      <div style="text-align:center;padding:30px 0;">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(currentQr)}" alt="QR" style="width:200px;height:200px;border-radius:10px;background:white;padding:10px;" />
+        <div style="margin-top:12px;font-size:14px;font-weight:600;color:#e9edef;">Escaneie o QR Code</div>
+        <div style="margin-top:4px;font-size:12px;color:#8696a0;">WhatsApp → Aparelhos conectados → Escanear</div>
+      </div>`;
   } else if (currentStatus === "connected") {
-    statusContent = `<div class="gb-connected-box">
-      <div class="gb-connected-icon">✅</div>
-      <div class="gb-connected-title">Bot Ativo</div>
-      <div class="gb-connected-sub">Respondendo automaticamente</div>
-    </div>`;
+    statusContent = `
+      <div style="text-align:center;padding:30px 0;">
+        <div style="width:64px;height:64px;border-radius:50%;background:rgba(0,168,132,0.15);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
+          <span style="font-size:32px;">✅</span>
+        </div>
+        <div style="font-size:18px;font-weight:700;color:#e9edef;">${botActive ? 'Bot Ativo' : 'Bot Inativo'}</div>
+        <div style="font-size:13px;color:#00a884;margin-top:4px;">${botActive ? 'Respondendo mensagens automaticamente' : 'Bot pausado'}</div>
+        <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-top:16px;">
+          <span style="font-size:13px;color:#8696a0;">Bot Automático</span>
+          <div class="gb-switch-track ${botActive ? 'on' : 'off'}" id="gb-bot-toggle-painel">
+            <div class="gb-switch-thumb"></div>
+          </div>
+        </div>
+      </div>`;
   } else if (currentStatus === "connecting") {
-    statusContent = `<div style="text-align:center;padding:16px;">
-      <div class="gb-spinner"></div>
-      <div style="margin-top:10px;color:#8696a0;font-size:12px;">Gerando QR Code...</div>
-    </div>`;
+    statusContent = `
+      <div style="text-align:center;padding:30px 0;">
+        <div class="gb-spinner" style="margin:0 auto;"></div>
+        <div style="margin-top:12px;font-size:14px;font-weight:600;color:#e9edef;">Conectando...</div>
+        <div style="margin-top:4px;font-size:12px;color:#8696a0;">Aguarde enquanto preparamos a conexão.</div>
+      </div>`;
+  } else {
+    statusContent = `
+      <div style="text-align:center;padding:30px 0;">
+        <div style="width:64px;height:64px;border-radius:50%;background:#1a2730;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
+          <span style="font-size:32px;">❌</span>
+        </div>
+        <div style="font-size:18px;font-weight:700;color:#e9edef;">Desconectado</div>
+        <div style="font-size:13px;color:#8696a0;margin-top:4px;">Clique em Reconectar para iniciar.</div>
+      </div>`;
   }
 
   body.innerHTML = `
-    <div class="gb-card">
-      <div class="gb-card-title">📱 Conexão WhatsApp</div>
-      <div class="gb-status-row">
-        <div class="gb-dot ${dotClass}"></div>
-        <div>
-          <div class="gb-status-text">${statusLabel}</div>
-          <div class="gb-status-sub">${statusSub}</div>
-        </div>
-      </div>
-      ${statusContent}
-      <button class="gb-btn gb-btn-primary" id="gb-connect">🔄 ${currentStatus === "connected" ? "Reconectar" : "Conectar"}</button>
-      ${currentStatus === "connected" ? `<button class="gb-btn gb-btn-danger" id="gb-disconnect">⛔ Desconectar</button>` : ""}
+    <div class="gb-section-header">
+      <span class="gb-page-title">📊 Painel</span>
+    </div>
+    ${statusContent}
+    <div style="display:flex;gap:10px;justify-content:center;">
+      <button class="gb-btn gb-btn-primary" id="gb-connect" style="width:auto;padding:10px 24px;">🔄 Reconectar</button>
+      ${currentStatus === "connected" ? `<button class="gb-btn gb-btn-danger" id="gb-disconnect" style="width:auto;padding:10px 24px;">⛔ Desconectar</button>` : ""}
     </div>
   `;
   bindPainelEvents();
+  document.getElementById("gb-bot-toggle-painel")?.addEventListener("click", async () => {
+    botActive = !botActive;
+    await supabasePatch("bot_settings", 1, { is_active: botActive });
+    renderPainel(body);
+    renderFooter();
+  });
 }
 
 function bindPainelEvents() {
