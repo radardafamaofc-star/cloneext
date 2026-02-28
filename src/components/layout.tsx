@@ -27,32 +27,32 @@ export function AppSidebar() {
   const [location] = useLocation();
 
   return (
-    <Sidebar variant="inset" className="border-r border-border/50">
-      <SidebarHeader className="flex flex-row items-center gap-2 px-4 py-6">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm">
+    <Sidebar className="border-r border-border/50">
+      <SidebarHeader className="flex flex-row items-center gap-3 px-4 py-6">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
           <Bot className="h-5 w-5" />
         </div>
         <div className="flex flex-col">
-          <span className="text-sm font-bold tracking-tight font-display">GroqBot</span>
+          <span className="text-sm font-bold tracking-tight">GroqBot</span>
           <span className="text-xs text-muted-foreground leading-none">Assistente de Vendas</span>
         </div>
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+          <SidebarGroupLabel className="text-xs font-medium text-muted-foreground uppercase tracking-wider px-4">
             Navegação
           </SidebarGroupLabel>
           <SidebarGroupContent className="mt-2">
             <SidebarMenu>
               {navigation.map((item) => (
                 <SidebarMenuItem key={item.name}>
-                  <SidebarMenuButton 
-                    asChild 
+                  <SidebarMenuButton
+                    asChild
                     isActive={location === item.href}
                     tooltip={item.name}
                   >
-                    <Link href={item.href} className="flex items-center gap-3">
-                      <item.icon className="h-4 w-4" />
+                    <Link href={item.href} className="flex items-center gap-3 px-4 py-2">
+                      <item.icon className="h-5 w-5" />
                       <span className="font-medium">{item.name}</span>
                     </Link>
                   </SidebarMenuButton>
@@ -74,12 +74,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
   return (
     <SidebarProvider style={style}>
-      <div className="flex min-h-screen w-full bg-background/50">
+      <div className="flex min-h-screen w-full bg-background">
         <AppSidebar />
         <div className="flex flex-col flex-1 w-full overflow-hidden">
-          <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b border-border/50 bg-background/80 px-4 backdrop-blur-md">
+          <header className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b border-border/50 bg-background/80 px-4 backdrop-blur-md md:hidden">
             <SidebarTrigger />
-            <div className="flex-1" />
           </header>
           <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
             <div className="mx-auto max-w-6xl">
