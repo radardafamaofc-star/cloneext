@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Send, Users, Search, CheckSquare, Upload, ShieldCheck } from "lucide-react";
+import { Send, Users, Search, CheckSquare, Upload, ShieldCheck, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
 
@@ -104,6 +104,19 @@ export default function BulkSend() {
     e.target.value = "";
   };
 
+  const [clearingQueue, setClearingQueue] = useState(false);
+
+  const handleClearQueue = async () => {
+    setClearingQueue(true);
+    const { error } = await supabase.from("scheduled_messages").delete().eq("status", "pending");
+    setClearingQueue(false);
+    if (error) {
+      toast({ title: "Erro ao limpar fila", variant: "destructive" });
+    } else {
+      toast({ title: "Fila de envio limpa com sucesso" });
+    }
+  };
+
   const handleSend = async () => {
     if (selected.size === 0 || !message.trim()) return;
     setSending(true);
@@ -153,10 +166,16 @@ export default function BulkSend() {
             Selecione contatos e envie uma mensagem para todos de uma vez
           </p>
         </div>
-        <Button variant="outline" onClick={() => document.getElementById("csv-import")?.click()} disabled={!contacts}>
-          <Upload className="h-4 w-4 mr-2" />
-          Importar CSV
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => document.getElementById("csv-import")?.click()} disabled={!contacts}>
+            <Upload className="h-4 w-4 mr-2" />
+            Importar CSV
+          </Button>
+          <Button variant="destructive" size="sm" onClick={handleClearQueue} disabled={clearingQueue}>
+            <Trash2 className="h-4 w-4 mr-1" />
+            {clearingQueue ? "Limpando..." : "Limpar Fila"}
+          </Button>
+        </div>
         <input id="csv-import" type="file" accept=".csv" className="hidden" onChange={importCSV} />
       </div>
 
