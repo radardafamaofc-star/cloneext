@@ -4,7 +4,7 @@ import { Download, Chrome } from "lucide-react";
 
 export function ExtensionDownload() {
   const handleDownload = () => {
-    window.location.href = '/extension.tar.gz';
+    window.location.href = '/extension.zip';
   };
 
   return (
@@ -29,15 +29,15 @@ export function ExtensionDownload() {
             <h4 className="text-sm font-medium">Como instalar:</h4>
             <ol className="text-xs text-muted-foreground list-decimal list-inside space-y-1">
               <li>Baixe o arquivo da extensão clicando no botão abaixo.</li>
-              <li>Extraia o arquivo (pode usar o WinRAR ou 7-Zip).</li>
+              <li>Extraia o arquivo (clique com o botão direito > Extrair tudo).</li>
               <li>Abra o Chrome e acesse <code className="bg-background px-1 rounded">chrome://extensions</code>.</li>
               <li>Ative o "Modo do desenvolvedor" no canto superior direito.</li>
-              <li>Clique em "Carregar sem compactação" e selecione a pasta extraída.</li>
+              <li>Clique em "Carregar sem compactação" e selecione a <strong>pasta</strong> extraída (onde está o manifest.json).</li>
             </ol>
           </div>
           <Button onClick={handleDownload} className="w-full gap-2">
             <Download className="h-4 w-4" />
-            Baixar Extensão (.tar.gz)
+            Baixar Extensão (.zip)
           </Button>
         </div>
       </CardContent>
