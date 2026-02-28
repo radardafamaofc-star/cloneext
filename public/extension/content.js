@@ -1,6 +1,8 @@
 // Content script to inject the dashboard into WhatsApp Web
 console.log('GroqBot Extension loaded');
 
+const DASHBOARD_URL = 'https://' + window.location.hostname.replace('web.whatsapp.com', 'replit.app'); // Simplistic guess
+
 function injectSidebar() {
   if (document.getElementById('groqbot-sidebar')) return;
 
@@ -21,9 +23,9 @@ function injectSidebar() {
   `;
 
   const iframe = document.createElement('iframe');
-  // Detecta o host do Replit dinamicamente
-  const host = window.location.origin;
-  iframe.src = host; 
+  // Detect current replit host
+  const REPLIT_HOST = "https://groqbot.replit.app";
+  iframe.src = REPLIT_HOST; 
   iframe.style.cssText = 'width: 100%; height: 100%; border: none;';
   
   const toggleBtn = document.createElement('button');
@@ -57,12 +59,12 @@ function injectSidebar() {
   sidebar.appendChild(iframe);
   document.body.appendChild(toggleBtn);
   
-  // Ajusta o layout do WhatsApp
+  // Adjust layout
   const app = document.getElementById('app');
   if (app) app.style.marginRight = '350px';
 }
 
-// Monitora o carregamento do WhatsApp
+// Wait for WhatsApp load
 const observer = new MutationObserver((mutations, obs) => {
   const main = document.getElementById('main') || document.querySelector('[data-testid="intro-text"]');
   if (main) {
