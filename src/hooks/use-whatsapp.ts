@@ -1,13 +1,22 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
 export function useWhatsAppStatus() {
   return useQuery({
     queryKey: ["whatsapp_status"],
     queryFn: async () => {
-      const response = await fetch("/api/whatsapp/status");
-      if (!response.ok) throw new Error("Failed to fetch WhatsApp status");
-      return response.json();
+      const { data, error } = await supabase
+        .from("whatsapp_status")
+        .select("*")
+        .eq("id", 1)
+        .single();
+
+      if (error) throw new Error(error.message);
+      return {
+        status: data.status || "disconnected",
+        qrCode: data.qr_code,
+      };
     },
     refetchInterval: 3000,
   });
@@ -19,9 +28,12 @@ export function useRestartWhatsApp() {
 
   return useMutation({
     mutationFn: async () => {
-      const response = await fetch("/api/whatsapp/restart", { method: "POST" });
-      if (!response.ok) throw new Error("Failed to restart WhatsApp");
-      return response.json();
+      const { error } = await supabase
+        .from("whatsapp_status")
+        .update({ status: "connecting", qr_code: null, updated_at: new Date().toISOString() })
+        .eq("id", 1);
+
+      if (error) throw new Error(error.message);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["whatsapp_status"] });
@@ -46,9 +58,12 @@ export function useDisconnectWhatsApp() {
 
   return useMutation({
     mutationFn: async () => {
-      const response = await fetch("/api/whatsapp/restart", { method: "POST" }); // For simplicity, restart clears session
-      if (!response.ok) throw new Error("Failed to disconnect WhatsApp");
-      return response.json();
+      const { error } = await supabase
+        .from("whatsapp_status")
+        .update({ status: "disconnected", qr_code: null, updated_at: new Date().toISOString() })
+        .eq("id", 1);
+
+      if (error) throw new Error(error.message);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["whatsapp_status"] });
