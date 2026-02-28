@@ -20,6 +20,7 @@ export default defineConfig({
   },
   optimizeDeps: {
     include: ["react", "react-dom", "react/jsx-runtime"],
+    force: true,
   },
   server: {
     host: "0.0.0.0",
