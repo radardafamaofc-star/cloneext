@@ -1,7 +1,7 @@
 // GroqBot Extension - Content Script for WhatsApp Web
 // Injects a sidebar panel with the GroqBot dashboard
 
-const DASHBOARD_URL = "https://id-preview--9fd614a6-760a-4974-a758-b5f4903eb16e.lovable.app";
+const DASHBOARD_URL = "https://groqbot.lovable.app";
 const SIDEBAR_WIDTH = 380;
 
 function createSidebar() {
