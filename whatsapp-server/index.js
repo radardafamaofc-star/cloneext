@@ -19,6 +19,18 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 // ── Helpers ──
 async function updateStatus(status, qrCode = null) {
+  // Try to use the API first if available, otherwise fallback to Supabase
+  try {
+    const response = await fetch('/api/whatsapp/status', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status, qrCode })
+    });
+    if (response.ok) return;
+  } catch (e) {
+    // Fallback to Supabase
+  }
+
   const { error } = await supabase
     .from('whatsapp_status')
     .update({ status, qr_code: qrCode, updated_at: new Date().toISOString() })
@@ -26,6 +38,16 @@ async function updateStatus(status, qrCode = null) {
   
   if (error) console.error('Erro ao atualizar status:', error.message);
 }
+
+// Add event listener for the button
+document.addEventListener('DOMContentLoaded', () => {
+  const btn = document.getElementById('open-wa');
+  if (btn) {
+    btn.addEventListener('click', () => {
+      window.open('https://web.whatsapp.com', '_blank');
+    });
+  }
+});
 
 async function getSettings() {
   const { data, error } = await supabase

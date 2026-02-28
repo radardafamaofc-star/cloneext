@@ -29,7 +29,7 @@ export function ExtensionDownload() {
             <h4 className="text-sm font-medium">Como instalar:</h4>
             <ol className="text-xs text-muted-foreground list-decimal list-inside space-y-1">
               <li>Baixe o arquivo da extensão clicando no botão abaixo.</li>
-              <li>Extraia o arquivo (clique com o botão direito > Extrair tudo).</li>
+              <li>Extraia o arquivo (clique com o botão direito e selecione "Extrair tudo").</li>
               <li>Abra o Chrome e acesse <code className="bg-background px-1 rounded">chrome://extensions</code>.</li>
               <li>Ative o "Modo do desenvolvedor" no canto superior direito.</li>
               <li>Clique em "Carregar sem compactação" e selecione a <strong>pasta</strong> extraída (onde está o manifest.json).</li>
