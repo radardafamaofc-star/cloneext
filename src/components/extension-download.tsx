@@ -1,10 +1,51 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Download, Chrome } from "lucide-react";
+import { useState } from "react";
+import JSZip from "jszip";
+
+const EXTENSION_FILES = [
+  "manifest.json",
+  "popup.html",
+  "popup.js",
+  "content.js",
+  "content.css",
+  "style.css",
+  "background.js",
+  "icon16.png",
+  "icon48.png",
+  "icon128.png",
+];
 
 export function ExtensionDownload() {
-  const handleDownload = () => {
-    window.location.href = '/extension.zip';
+  const [loading, setLoading] = useState(false);
+
+  const handleDownload = async () => {
+    setLoading(true);
+    try {
+      const zip = new JSZip();
+      const folder = zip.folder("groqbot-extension")!;
+
+      await Promise.all(
+        EXTENSION_FILES.map(async (file) => {
+          const res = await fetch(`/extension/${file}`);
+          const blob = await res.blob();
+          folder.file(file, blob);
+        })
+      );
+
+      const content = await zip.generateAsync({ type: "blob" });
+      const url = URL.createObjectURL(content);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "groqbot-extension.zip";
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      console.error("Erro ao gerar zip:", e);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -35,9 +76,9 @@ export function ExtensionDownload() {
               <li>Clique em "Carregar sem compactação" e selecione a <strong>pasta</strong> extraída (onde está o manifest.json).</li>
             </ol>
           </div>
-          <Button onClick={handleDownload} className="w-full gap-2">
+          <Button onClick={handleDownload} disabled={loading} className="w-full gap-2">
             <Download className="h-4 w-4" />
-            Baixar Extensão (.zip)
+            {loading ? "Gerando..." : "Baixar Extensão (.zip)"}
           </Button>
         </div>
       </CardContent>
