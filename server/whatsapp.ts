@@ -34,14 +34,14 @@ export async function connectToWhatsApp() {
         
         if (connection === 'close') {
             const statusCode = (lastDisconnect?.error as Boom)?.output?.statusCode;
-            const shouldReconnect = statusCode !== DisconnectReason.loggedOut;
+            const shouldReconnect = statusCode !== DisconnectReason.loggedOut && statusCode !== 440;
             console.log('Connection closed. Status:', statusCode, 'Last error:', lastDisconnect?.error);
             
             currentQr = undefined;
             connectionStatus = 'disconnected';
 
-            if (statusCode === 401) {
-                console.log('Authentication failed (401). Clearing session data...');
+            if (statusCode === 401 || statusCode === 440) {
+                console.log(`Authentication issue (${statusCode}). Clearing session data...`);
                 // Internal cleanup of auth state is handled by Baileys if we don't provide valid creds
                 // but clearing the directory is the most reliable way to reset.
                 try {
@@ -62,6 +62,8 @@ export async function connectToWhatsApp() {
             if (shouldReconnect) {
                 console.log('Attempting to reconnect...');
                 setTimeout(() => connectToWhatsApp(), 3000);
+            } else if (statusCode === 440) {
+                console.log('Conflict detected. Manual restart required or session cleared.');
             }
         } else if (connection === 'open') {
             console.log('opened connection');
