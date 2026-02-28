@@ -88,6 +88,17 @@ export default function ScheduledMessages() {
     },
   });
 
+  const deleteAllMutation = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase.from("scheduled_messages").delete().neq("id", 0);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["scheduled-messages"] });
+      toast({ title: "Todos os agendamentos removidos" });
+    },
+  });
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -98,13 +109,25 @@ export default function ScheduledMessages() {
           </h1>
           <p className="text-muted-foreground mt-1">Agende envios automáticos de mensagens</p>
         </div>
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              Agendar
+        <div className="flex items-center gap-2">
+          {messages && messages.length > 0 && (
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => deleteAllMutation.mutate()}
+              disabled={deleteAllMutation.isPending}
+            >
+              <Trash2 className="h-4 w-4 mr-1" />
+              {deleteAllMutation.isPending ? "Removendo..." : "Remover Todos"}
             </Button>
-          </DialogTrigger>
+          )}
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                Agendar
+              </Button>
+            </DialogTrigger>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Nova Mensagem Agendada</DialogTitle>
@@ -146,6 +169,7 @@ export default function ScheduledMessages() {
             </div>
           </DialogContent>
         </Dialog>
+        </div>
       </div>
 
       {isLoading ? (
