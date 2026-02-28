@@ -39,15 +39,6 @@ async function updateStatus(status, qrCode = null) {
   if (error) console.error('Erro ao atualizar status:', error.message);
 }
 
-// Add event listener for the button
-document.addEventListener('DOMContentLoaded', () => {
-  const btn = document.getElementById('open-wa');
-  if (btn) {
-    btn.addEventListener('click', () => {
-      window.open('https://web.whatsapp.com', '_blank');
-    });
-  }
-});
 
 async function getSettings() {
   const { data, error } = await supabase
