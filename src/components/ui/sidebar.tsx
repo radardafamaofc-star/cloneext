@@ -1,17 +1,7 @@
 import * as React from "react"
-import { useLocation, Link } from "wouter"
 import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
-import { 
-  PanelLeftIcon, 
-  Chrome,
-  LayoutDashboard,
-  Zap,
-  Users,
-  Calendar,
-  Send,
-  Settings
-} from "lucide-react"
+import { PanelLeftIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { useIsMobile } from "@/hooks/use-mobile"
@@ -161,51 +151,6 @@ function Sidebar({
   collapsible?: "offcanvas" | "icon" | "none"
 }) {
   const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
-  const [location] = useLocation()
-
-  const items = [
-    { title: "Painel", url: "/", icon: LayoutDashboard },
-    { title: "Atalhos", url: "/shortcuts", icon: Zap },
-    { title: "Contatos", url: "/contacts", icon: Users },
-    { title: "Agendamentos", url: "/scheduled", icon: Calendar },
-    { title: "Envio em Massa", url: "/bulk-send", icon: Send },
-    { title: "Configurações", url: "/settings", icon: Settings },
-  ]
-
-  const sidebarContent = (
-    <div className="flex flex-col h-full">
-      <SidebarHeader className="p-4 border-b">
-        <h2 className="text-xl font-bold text-primary">GroqBot</h2>
-      </SidebarHeader>
-      <SidebarContent className="flex-1">
-        <SidebarMenu className="p-2 space-y-1">
-          {items.map((item) => (
-            <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton asChild isActive={location === item.url} tooltip={item.title}>
-                <Link href={item.url} className="flex items-center gap-3 px-3 py-2 rounded-md transition-colors">
-                  <item.icon className="h-5 w-5" />
-                  <span className="font-medium">{item.title}</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
-          <SidebarSeparator className="my-2" />
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild tooltip="Baixar Extensão">
-              <a href="/extension.tar.gz" download className="flex items-center gap-3 px-3 py-2 rounded-md transition-colors text-blue-600 hover:bg-blue-50">
-                <Chrome className="h-5 w-5" />
-                <span className="font-medium">Download Extensão</span>
-              </a>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarContent>
-      <SidebarFooter className="p-4 border-t text-xs text-muted-foreground text-center">
-        GroqBot v1.0
-      </SidebarFooter>
-    </div>
-  )
-
   if (collapsible === "none") {
     return (
       <div
@@ -216,7 +161,7 @@ function Sidebar({
         )}
         {...props}
       >
-        {sidebarContent}
+        {children}
       </div>
     )
   }
@@ -240,7 +185,7 @@ function Sidebar({
             <SheetTitle>Sidebar</SheetTitle>
             <SheetDescription>Displays the mobile sidebar.</SheetDescription>
           </SheetHeader>
-          <div className="flex h-full w-full flex-col">{sidebarContent}</div>
+          <div className="flex h-full w-full flex-col">{children}</div>
         </SheetContent>
       </Sheet>
     )
@@ -285,7 +230,7 @@ function Sidebar({
           data-slot="sidebar-inner"
           className="bg-sidebar group-data-[variant=floating]:border-sidebar-border flex h-full w-full flex-col group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:shadow-sm"
         >
-          {sidebarContent}
+          {children}
         </div>
       </div>
     </div>
