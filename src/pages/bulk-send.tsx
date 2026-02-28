@@ -126,12 +126,16 @@ export default function BulkSend() {
 
     // Schedule each message with incremental delay for safe sending
     const now = new Date();
-    const rows = selectedContacts.map((c, i) => ({
-      phone_number: c.phone_number,
-      message: message.trim(),
-      scheduled_at: new Date(now.getTime() + i * delay * 1000).toISOString(),
-      status: "pending",
-    }));
+    const rows = selectedContacts.map((c, i) => {
+      // Use the actual phone number: if 'name' looks like a phone number, use it; otherwise use phone_number
+      const realPhone = (c.name && /\d{8,}/.test(c.name.replace(/\D/g, ''))) ? c.name.replace(/\D/g, '') : c.phone_number.replace(/\D/g, '');
+      return {
+        phone_number: realPhone,
+        message: message.trim(),
+        scheduled_at: new Date(now.getTime() + i * delay * 1000).toISOString(),
+        status: "pending",
+      };
+    });
 
     const { error } = await supabase.from("scheduled_messages").insert(rows);
 
