@@ -1,31 +1,206 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <style>
-    body { width: 300px; padding: 15px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #f4f7f6; }
-    .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: center; }
-    h3 { margin: 0 0 10px 0; color: #1a1a1a; }
-    .status { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; rounded-radius: 20px; font-size: 12px; font-weight: 600; margin-bottom: 20px; }
-    .status-connected { background: #e6fcf5; color: #0ca678; }
-    .status-disconnected { background: #fff5f5; color: #fa5252; }
-    .status-qr { background: #fff9db; color: #f08c00; }
-    button { width: 100%; padding: 12px; background: #25D366; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; transition: background 0.2s; }
-    button:hover { background: #128C7E; }
-    #qr-container { margin-top: 15px; background: white; padding: 10px; border-radius: 8px; border: 1px solid #ddd; display: none; }
-    #qr-container img { width: 100%; height: auto; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      width: 320px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #0b141a;
+      color: #e9edef;
+    }
+    .header {
+      background: linear-gradient(135deg, #00a884, #25d366);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .header-icon {
+      width: 32px;
+      height: 32px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+    .header h1 {
+      font-size: 16px;
+      font-weight: 700;
+      color: white;
+    }
+    .header p {
+      font-size: 11px;
+      color: rgba(255,255,255,0.8);
+    }
+    .content { padding: 16px; }
+
+    .status-card {
+      background: #1f2c33;
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .dot-connected { background: #00a884; box-shadow: 0 0 6px #00a884; }
+    .dot-disconnected { background: #ea4335; box-shadow: 0 0 6px #ea4335; }
+    .dot-qr { background: #f9a825; box-shadow: 0 0 6px #f9a825; animation: pulse 1.5s infinite; }
+    .dot-connecting { background: #f9a825; animation: pulse 1s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+    .status-text { font-size: 13px; font-weight: 600; }
+    .status-sub { font-size: 11px; color: #8696a0; margin-top: 2px; }
+
+    .qr-section {
+      background: #1f2c33;
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+      margin-bottom: 12px;
+      display: none;
+    }
+    .qr-section.visible { display: block; }
+    .qr-section p {
+      font-size: 12px;
+      color: #8696a0;
+      margin-bottom: 12px;
+    }
+    .qr-section img {
+      width: 200px;
+      height: 200px;
+      border-radius: 8px;
+      background: white;
+      padding: 8px;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 13px;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .btn-primary {
+      background: #00a884;
+      color: white;
+    }
+    .btn-primary:hover { background: #008f72; }
+    .btn-secondary {
+      background: #1f2c33;
+      color: #e9edef;
+      border: 1px solid #2a3942;
+    }
+    .btn-secondary:hover { background: #2a3942; }
+
+    .connected-info {
+      background: #1f2c33;
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+      margin-bottom: 12px;
+      display: none;
+    }
+    .connected-info.visible { display: block; }
+    .connected-info .icon { font-size: 36px; margin-bottom: 8px; }
+    .connected-info h3 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+    .connected-info p { font-size: 12px; color: #8696a0; }
+
+    .footer {
+      padding: 12px 16px;
+      border-top: 1px solid #2a3942;
+      text-align: center;
+    }
+    .footer a {
+      font-size: 11px;
+      color: #00a884;
+      text-decoration: none;
+    }
+    .footer a:hover { text-decoration: underline; }
+
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+    }
+    .spinner {
+      width: 24px;
+      height: 24px;
+      border: 3px solid #2a3942;
+      border-top-color: #00a884;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h3>GroqBot</h3>
-    <div id="status-badge" class="status">Carregando...</div>
-    <div id="qr-container">
-      <p style="font-size: 12px; color: #666; margin-bottom: 10px;">Escaneie para conectar:</p>
-      <div id="qrcode"></div>
+  <div class="header">
+    <div class="header-icon">🤖</div>
+    <div>
+      <h1>GroqBot</h1>
+      <p>Assistente de Vendas IA</p>
     </div>
-    <button id="open-wa">Abrir WhatsApp Web</button>
   </div>
+
+  <div class="content">
+    <div id="loading" class="loading">
+      <div class="spinner"></div>
+    </div>
+
+    <div id="main-content" style="display:none">
+      <div class="status-card">
+        <div id="status-dot" class="status-dot dot-disconnected"></div>
+        <div>
+          <div id="status-text" class="status-text">Desconectado</div>
+          <div id="status-sub" class="status-sub">Verificando...</div>
+        </div>
+      </div>
+
+      <div id="qr-section" class="qr-section">
+        <p>Escaneie o QR Code com seu WhatsApp:</p>
+        <img id="qr-img" src="" alt="QR Code" />
+      </div>
+
+      <div id="connected-info" class="connected-info">
+        <div class="icon">✅</div>
+        <h3>Bot Ativo</h3>
+        <p>Seu assistente está respondendo mensagens automaticamente.</p>
+      </div>
+
+      <button id="btn-open-wa" class="btn btn-primary">
+        📱 Abrir WhatsApp Web
+      </button>
+
+      <button id="btn-dashboard" class="btn btn-secondary">
+        ⚙️ Abrir Painel de Controle
+      </button>
+    </div>
+  </div>
+
+  <div class="footer">
+    <a id="link-dashboard" href="#">Acessar Dashboard Completo →</a>
+  </div>
+
   <script src="popup.js"></script>
 </body>
 </html>
