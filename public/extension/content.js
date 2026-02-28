@@ -108,21 +108,20 @@ function createSidebar() {
     }
     .gb-close:hover { background: rgba(255,255,255,0.3); }
 
-    /* Navigation Menu */
+    /* Navigation Menu - Vertical List */
     .gb-nav {
-      display: flex; flex-wrap: wrap; gap: 2px; padding: 8px 8px 4px; background: #111b21;
+      display: flex; flex-direction: column; gap: 2px; padding: 8px; background: #111b21;
       border-bottom: 1px solid #2a3942; flex-shrink: 0;
     }
     .gb-nav-item {
-      flex: 1 1 calc(33.33% - 4px); min-width: 0;
-      padding: 8px 4px; border: none; border-radius: 8px; cursor: pointer;
-      font-size: 10px; font-weight: 500; color: #8696a0; background: transparent;
-      display: flex; flex-direction: column; align-items: center; gap: 3px;
-      transition: all 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      width: 100%; padding: 10px 12px; border: none; border-radius: 8px; cursor: pointer;
+      font-size: 13px; font-weight: 500; color: #8696a0; background: transparent;
+      display: flex; flex-direction: row; align-items: center; gap: 10px;
+      transition: all 0.2s; text-align: left;
     }
     .gb-nav-item:hover { background: #1f2c33; color: #e9edef; }
     .gb-nav-item.active { background: #00a884; color: white; font-weight: 600; }
-    .gb-nav-icon { font-size: 16px; }
+    .gb-nav-icon { font-size: 16px; flex-shrink: 0; }
 
     .gb-body { flex: 1; overflow-y: auto; padding: 12px; }
     .gb-card {
