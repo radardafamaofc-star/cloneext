@@ -119,6 +119,39 @@ export type Database = {
         }
         Relationships: []
       }
+      pix_transactions: {
+        Row: {
+          amount: number
+          created_at: string
+          end_to_end_id: string | null
+          id: string
+          paid_at: string | null
+          panel: string
+          status: string
+          transaction_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          end_to_end_id?: string | null
+          id?: string
+          paid_at?: string | null
+          panel: string
+          status?: string
+          transaction_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          end_to_end_id?: string | null
+          id?: string
+          paid_at?: string | null
+          panel?: string
+          status?: string
+          transaction_id?: string
+        }
+        Relationships: []
+      }
       scheduled_messages: {
         Row: {
           created_at: string

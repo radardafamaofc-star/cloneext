@@ -1,9 +1,14 @@
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.95.0";
 import { corsHeaders } from "https://esm.sh/@supabase/supabase-js@2.95.0/cors";
 
 interface CreateBody {
   amount: number;
   panel: string;
 }
+
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+const PROJECT_REF = SUPABASE_URL.replace("https://", "").split(".")[0];
+const WEBHOOK_URL = `https://${PROJECT_REF}.supabase.co/functions/v1/misticpay-webhook`;
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -35,17 +40,14 @@ Deno.serve(async (req) => {
 
     const resp = await fetch("https://api.misticpay.com/api/transactions/create", {
       method: "POST",
-      headers: {
-        ci,
-        cs,
-        "Content-Type": "application/json",
-      },
+      headers: { ci, cs, "Content-Type": "application/json" },
       body: JSON.stringify({
         amount,
         payerName: "Cliente Renovação",
         payerDocument: "00000000000",
         transactionId,
         description: `Renovação: ${panel}`,
+        projectWebhook: WEBHOOK_URL,
       }),
     });
 
@@ -58,10 +60,24 @@ Deno.serve(async (req) => {
       );
     }
 
-    return new Response(JSON.stringify({ data: data.data }), {
-      status: 200,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    // Registrar a transação no banco (pendente). Realtime notificará o frontend
+    // assim que o webhook atualizar para COMPLETO.
+    const supabase = createClient(
+      SUPABASE_URL,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+    );
+    const { error: dbError } = await supabase.from("pix_transactions").insert({
+      transaction_id: transactionId,
+      panel,
+      amount,
+      status: "PENDENTE",
     });
+    if (dbError) console.error("[misticpay-create] db insert error", dbError);
+
+    return new Response(
+      JSON.stringify({ data: { ...data.data, transactionId } }),
+      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    );
   } catch (e) {
     console.error("misticpay-create exception", e);
     const msg = e instanceof Error ? e.message : "Unknown error";
