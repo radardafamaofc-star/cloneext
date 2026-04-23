@@ -1,1 +1,7 @@
 project_id = "jlyqbwfuvdewvhaednvd"
+
+[functions.misticpay-create]
+verify_jwt = false
+
+[functions.misticpay-check]
+verify_jwt = false
