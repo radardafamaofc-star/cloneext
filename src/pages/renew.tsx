@@ -101,25 +101,48 @@ export default function Renew() {
     }
   };
 
-  // Polling status
+  // Realtime: escuta atualização da transação na tabela pix_transactions.
+  // Fallback de polling a cada 8s caso o Realtime não entregue (rede instável).
   useEffect(() => {
     if (!pix || paid) return;
-    const check = async () => {
+
+    const onPaid = () => {
+      setPaid(true);
+      fireConfetti();
+      toast({ title: "Pagamento confirmado!", description: "Seu painel foi renovado por +30 dias." });
+    };
+
+    const channel = supabase
+      .channel(`pix-${pix.transactionId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "pix_transactions",
+          filter: `transaction_id=eq.${pix.transactionId}`,
+        },
+        (payload) => {
+          if ((payload.new as { status?: string })?.status === "COMPLETO") onPaid();
+        },
+      )
+      .subscribe();
+
+    // Fallback de polling (segurança)
+    const fallback = async () => {
       try {
         const { data } = await supabase.functions.invoke("misticpay-check", {
           body: { transactionId: pix.transactionId },
         });
-        if (data?.transaction?.transactionState === "COMPLETO") {
-          setPaid(true);
-          fireConfetti();
-          toast({ title: "Pagamento confirmado!", description: "Seu painel foi renovado por +30 dias." });
-        }
+        if (data?.transaction?.transactionState === "COMPLETO") onPaid();
       } catch {
         /* silencioso */
       }
     };
-    pollRef.current = window.setInterval(check, 4000);
+    pollRef.current = window.setInterval(fallback, 8000);
+
     return () => {
+      supabase.removeChannel(channel);
       if (pollRef.current) window.clearInterval(pollRef.current);
     };
   }, [pix, paid, toast]);
