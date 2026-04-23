@@ -288,7 +288,7 @@ export default function Renew() {
                   <div className="text-center mb-4">
                     <p className="text-xs text-muted-foreground">Valor</p>
                     <p className="text-2xl font-bold">
-                      R$ {(pix.transactionAmount / 100).toFixed(2).replace(".", ",")}
+                      R$ {pix.transactionAmount.toFixed(2).replace(".", ",")}
                     </p>
                   </div>
 
