@@ -237,10 +237,30 @@ export default function Renew() {
               style={{ boxShadow: "var(--shadow-card)" }}
             >
               {paid ? (
-                <div className="flex flex-col items-center text-center py-6">
-                  <CheckCircle2 className="h-16 w-16 text-primary mb-4" />
+                <div className="flex flex-col items-center text-center py-6 animate-scale-in">
+                  <div className="relative mb-4">
+                    <div
+                      className="absolute inset-0 rounded-full blur-2xl opacity-60"
+                      style={{ background: "var(--gradient-primary)" }}
+                      aria-hidden
+                    />
+                    <CheckCircle2 className="relative h-20 w-20 text-primary" />
+                  </div>
+                  <div className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-[11px] font-medium text-primary mb-3">
+                    <PartyPopper className="h-3 w-3" />
+                    Renovação confirmada
+                  </div>
                   <h2 className="text-2xl font-bold mb-2">Pagamento confirmado!</h2>
-                  <p className="text-sm text-muted-foreground mb-6">Sua renovação foi processada com sucesso.</p>
+                  <p className="text-base font-medium mb-1">
+                    Seu painel foi renovado por{" "}
+                    <span
+                      className="bg-clip-text text-transparent font-bold"
+                      style={{ backgroundImage: "var(--gradient-primary)" }}
+                    >
+                      +30 dias
+                    </span>
+                  </p>
+                  <p className="text-xs text-muted-foreground mb-6">Aproveite! 🎉</p>
                   <Button onClick={reset} className="rounded-xl" style={{ background: "var(--gradient-primary)" }}>
                     Nova renovação
                   </Button>
