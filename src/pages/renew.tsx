@@ -109,7 +109,8 @@ export default function Renew() {
         });
         if (data?.transaction?.transactionState === "COMPLETO") {
           setPaid(true);
-          toast({ title: "Pagamento confirmado!", description: "Sua renovação foi processada." });
+          fireConfetti();
+          toast({ title: "Pagamento confirmado!", description: "Seu painel foi renovado por +30 dias." });
         }
       } catch {
         /* silencioso */
