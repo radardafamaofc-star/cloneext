@@ -87,7 +87,9 @@ export default function Renew() {
       });
       if (error) throw error;
       if (!data?.data) throw new Error("Resposta inválida");
-      setPix(data.data as PixData);
+      // Usar o valor enviado pelo usuário (em reais) para exibição,
+      // pois a API retorna o valor em centavos.
+      setPix({ ...(data.data as PixData), transactionAmount: numericAmount });
     } catch (err: any) {
       toast({
         title: "Erro ao gerar PIX",
