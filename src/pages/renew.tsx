@@ -3,8 +3,42 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, QrCode, ShieldCheck, Zap, Lock, Copy, CheckCircle2, ArrowLeft } from "lucide-react";
+import { Loader2, QrCode, ShieldCheck, Zap, Lock, Copy, CheckCircle2, ArrowLeft, PartyPopper } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import confetti from "canvas-confetti";
+
+const fireConfetti = () => {
+  const duration = 2500;
+  const end = Date.now() + duration;
+  const colors = ["#22c55e", "#16a34a", "#4ade80", "#ffffff"];
+
+  // Burst inicial
+  confetti({
+    particleCount: 150,
+    spread: 90,
+    origin: { y: 0.6 },
+    colors,
+  });
+
+  // Canhões laterais
+  (function frame() {
+    confetti({
+      particleCount: 4,
+      angle: 60,
+      spread: 55,
+      origin: { x: 0, y: 0.7 },
+      colors,
+    });
+    confetti({
+      particleCount: 4,
+      angle: 120,
+      spread: 55,
+      origin: { x: 1, y: 0.7 },
+      colors,
+    });
+    if (Date.now() < end) requestAnimationFrame(frame);
+  })();
+};
 
 type PixData = {
   transactionId: string;
